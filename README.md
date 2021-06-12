@@ -1,4 +1,6 @@
 # ACTIONetExperiment
+![Diagram](ACE_diagram.png)
+
 ## Installation
 ### Setting Up the Environment (Preinstallation)
 **For Linux Users** 
