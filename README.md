@@ -1,4 +1,6 @@
 # ACTIONetExperiment
+ACTIONetExperiment is the extension of [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) class specifically designed to match the structure of Python [AnnData](https://anndata.readthedocs.io/en/latest/) objects.
+
 ![Diagram](ACE_diagram.png)
 
 ## Installation
