@@ -812,7 +812,9 @@ AnnData2ACE <- function(file,
         }
         metadata(ace) <- meta
     }
-    genome(ace) <- metadata(ace)$genome
+    if (!is.null(metadata(ace)$genome)) {
+          genome(ace) <- metadata(ace)$genome
+      }
 
     h5file$close_all()
 
