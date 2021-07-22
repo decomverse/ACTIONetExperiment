@@ -597,7 +597,6 @@ ACE2AnnData <- function(ace,
     }
 
     h5file$close_all()
-    close(h5file)
 }
 
 #' @import hdf5r
