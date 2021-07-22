@@ -26,12 +26,11 @@ setMethod("colNets", "ACTIONetExperiment", function(object) {
 #' @rdname rowMaps
 #' @export
 setMethod("rowMaps", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = as(lapply(object@rowMaps, function(M) assays(M)$X), "SimpleList")
+    out <- as(lapply(object@rowMaps, function(M) assays(M)[[1]]), "SimpleList")
 
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
@@ -43,11 +42,10 @@ setMethod("rowMaps", "ACTIONetExperiment", function(object, all = TRUE) {
 #' @rdname colMaps
 #' @export
 setMethod("colMaps", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = as(lapply(object@colMaps, function(M) assays(M)$X), "SimpleList")
+    out <- as(lapply(object@colMaps, function(M) assays(M)[[1]]), "SimpleList")
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@colMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@colMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
@@ -59,11 +57,10 @@ setMethod("colMaps", "ACTIONetExperiment", function(object, all = TRUE) {
 #' @rdname rowMapTypes
 #' @export
 setMethod("rowMapTypes", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = lapply(object@rowMaps, function(M) metadata(M)$type)
+    out <- lapply(object@rowMaps, function(M) metadata(M)$type)
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
@@ -75,11 +72,10 @@ setMethod("rowMapTypes", "ACTIONetExperiment", function(object, all = TRUE) {
 #' @rdname colMapTypes
 #' @export
 setMethod("colMapTypes", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = lapply(object@colMaps, function(M) metadata(M)$type)
+    out <- lapply(object@colMaps, function(M) metadata(M)$type)
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@colMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@colMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
@@ -91,11 +87,10 @@ setMethod("colMapTypes", "ACTIONetExperiment", function(object, all = TRUE) {
 #' @rdname rowMapTypes
 #' @export
 setMethod("rowMapMeta", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = lapply(object@rowMaps, function(M) colData(M))
+    out <- lapply(object@rowMaps, function(M) colData(M))
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@rowMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
@@ -107,19 +102,18 @@ setMethod("rowMapMeta", "ACTIONetExperiment", function(object, all = TRUE) {
 #' @rdname colMapTypes
 #' @export
 setMethod("colMapMeta", "ACTIONetExperiment", function(object, all = TRUE) {
-
-    out = lapply(object@colMaps, function(M) colData(M))
+    out <- lapply(object@colMaps, function(M) colData(M))
     if (all == FALSE & length(out) > 0) {
-        mask = sapply(object@colMaps, function(M) metadata(M)$type != "internal")
-        out = out[mask]
+        mask <- sapply(object@colMaps, function(M) metadata(M)$type != "internal")
+        out <- out[mask]
     }
 
     out
 })
 
 setMethod("reducedDims", "ACTIONetExperiment", function(x) {
-    Xs = colMaps(x)
-    Xs = Xs[colMapTypes(x) %in% c("embedding", "reduction")]
+    Xs <- colMaps(x)
+    Xs <- Xs[colMapTypes(x) %in% c("embedding", "reduction")]
 
     # transposed_factors = as(lapply(Xs, function(xs) Matrix::t(xs)), 'SimpleList')
     # return(transposed_factors)
@@ -127,8 +121,8 @@ setMethod("reducedDims", "ACTIONetExperiment", function(x) {
 })
 
 setMethod("reducedDimNames", "ACTIONetExperiment", function(x) {
-    Xs = colMaps(x)
-    Xs = Xs[colMapTypes(x) %in% c("embedding", "reduction")]
+    Xs <- colMaps(x)
+    Xs <- Xs[colMapTypes(x) %in% c("embedding", "reduction")]
 
     return(names(Xs))
 })
@@ -136,16 +130,16 @@ setMethod("reducedDimNames", "ACTIONetExperiment", function(x) {
 
 #' @export
 setMethod("rowEmbeddings", "ACTIONetExperiment", function(object) {
-    Xs = rowMaps(object)
-    Xs = Xs[rowMapTypes(object) %in% c("embedding")]
+    Xs <- rowMaps(object)
+    Xs <- Xs[rowMapTypes(object) %in% c("embedding")]
 
     return(Xs)
 })
 
 #' @export
 setMethod("colEmbeddings", "ACTIONetExperiment", function(object) {
-    Xs = colMaps(object)
-    Xs = Xs[colMapTypes(object) %in% c("embedding")]
+    Xs <- colMaps(object)
+    Xs <- Xs[colMapTypes(object) %in% c("embedding")]
 
     return(Xs)
 })
@@ -153,8 +147,8 @@ setMethod("colEmbeddings", "ACTIONetExperiment", function(object) {
 
 #' @export
 setMethod("rowReductions", "ACTIONetExperiment", function(object) {
-    Maps = rowMaps(object)
-    Maps = Maps[rowMapTypes(object) %in% c("reduction")]
+    Maps <- rowMaps(object)
+    Maps <- Maps[rowMapTypes(object) %in% c("reduction")]
 
     return(Maps)
 })
@@ -162,8 +156,8 @@ setMethod("rowReductions", "ACTIONetExperiment", function(object) {
 
 #' @export
 setMethod("colReductions", "ACTIONetExperiment", function(object) {
-    Maps = colMaps(object)
-    Maps = Maps[colMapTypes(object) %in% c("reduction")]
+    Maps <- colMaps(object)
+    Maps <- Maps[colMapTypes(object) %in% c("reduction")]
 
     return(Maps)
 })
