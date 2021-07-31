@@ -202,6 +202,7 @@ write.HD5List <- function(h5file,
     h5group <- h5file$create_group(gname)
 
     obj_list <- as.list(obj_list)
+    obj_list = obj_list[match(unique(names(obj_list)), names(obj_list))]
 
     for (nn in names(obj_list)) {
         obj <- obj_list[[nn]]
