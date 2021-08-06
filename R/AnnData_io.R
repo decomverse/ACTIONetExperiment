@@ -701,7 +701,7 @@ AnnData2ACE <- function(file,
             if ("encoding-type" %in% names(attr)) {
                 if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
                     Xr <- read.HD5SpMat(obsm, mn, compression_level)
-                } else if ("encoding-type" %in% c("dataframe")) {
+                } else if (attr[["encoding-type"]] == "dataframe") {
                     obj <- read.HD5DF(obsm, mn, compression_level = compression_level)
                     Xr <- as.matrix(obj)
                 } else {
