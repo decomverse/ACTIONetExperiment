@@ -202,7 +202,7 @@ write.HD5List <- function(h5file,
     h5group <- h5file$create_group(gname)
 
     obj_list <- as.list(obj_list)
-    obj_list = obj_list[match(unique(names(obj_list)), names(obj_list))]
+    obj_list <- obj_list[match(unique(names(obj_list)), names(obj_list))]
 
     for (nn in names(obj_list)) {
         obj <- obj_list[[nn]]
@@ -702,10 +702,10 @@ AnnData2ACE <- function(file,
                 if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
                     Xr <- read.HD5SpMat(obsm, mn, compression_level)
                 } else {
-                    err <- sprintf("Error reading obsm %s", mn)
+                    err <- sprintf("Error reading obsm %s (encoding = %s)", mn, attr[["encoding-type"]])
                     h5file$close_all()
                     message(attr)
-                    stop(msg)
+                    stop(err)
                 }
             } else {
                 Xr <- obsm[[mn]]$read()
@@ -814,8 +814,8 @@ AnnData2ACE <- function(file,
         metadata(ace) <- meta
     }
     if (!is.null(metadata(ace)$genome)) {
-          genome(ace) <- metadata(ace)$genome
-      }
+        genome(ace) <- metadata(ace)$genome
+    }
 
     h5file$close_all()
 
