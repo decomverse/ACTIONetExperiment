@@ -32,6 +32,7 @@ Rcpp::NumericVector arma2vec(const T &x)
   return Rcpp::NumericVector(x.begin(), x.end());
 }
 
+// [[Rcpp::export]]
 vec roll_var(vec &X)
 {
   const uword n_max = X.n_elem;
@@ -54,6 +55,7 @@ vec roll_var(vec &X)
   return out;
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericVector fast_row_sums(SEXP &A)
 {
   vec sum_vec;
@@ -78,6 +80,7 @@ Rcpp::NumericVector fast_row_sums(SEXP &A)
   return (arma2vec(sum_vec));
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericVector fast_column_sums(SEXP &A)
 {
   vec sum_vec;
@@ -102,6 +105,7 @@ Rcpp::NumericVector fast_column_sums(SEXP &A)
   return (arma2vec(sum_vec));
 }
 
+// [[Rcpp::export]]
 Rcpp::NumericVector fast_row_max(SEXP &A)
 {
   vec sum_vec;
@@ -128,6 +132,7 @@ Rcpp::NumericVector fast_row_max(SEXP &A)
 
 // Adapted from
 // https://github.com/GreenleafLab/MPAL-Single-Cell-2019/blob/master/scRNA_02_Cluster_Disease_w_Reference_v1.R
+// [[Rcpp::export]]
 Rcpp::NumericVector computeSparseRowVariances(IntegerVector j,
                                               NumericVector val,
                                               NumericVector rm, int n)
@@ -153,6 +158,7 @@ Rcpp::NumericVector computeSparseRowVariances(IntegerVector j,
   return (rv);
 }
 
+// [[Rcpp::export]]
 sp_mat bind_sparse_mats(sp_mat &A, sp_mat &B, int dim = 0)
 {
   sp_mat C;
@@ -177,6 +183,7 @@ bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
   return x.first < y.first;
 }
 
+// [[Rcpp::export]]
 void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
                               NumericVector &Ax)
 {
@@ -212,6 +219,7 @@ void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
   }
 }
 
+// [[Rcpp::export]]
 void csc_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Ai,
                               NumericVector &Ax)
 {
