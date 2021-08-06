@@ -33,11 +33,11 @@ Rcpp::NumericVector arma2vec(const T &x)
 }
 
 // [[Rcpp::export]]
-vec roll_var(vec &X)
+arma::vec roll_var(arma::vec &X)
 {
   const uword n_max = X.n_elem;
   double xbar = 0, M = 0;
-  vec out(n_max);
+  arma::vec out(n_max);
   double *x = X.begin(), *o = out.begin();
 
   for (uword n = 1; n <= n_max; ++n, ++x, ++o)
@@ -58,14 +58,14 @@ vec roll_var(vec &X)
 // [[Rcpp::export]]
 Rcpp::NumericVector fast_row_sums(SEXP &A)
 {
-  vec sum_vec;
+  arma::vec sum_vec;
   if (Rf_isS4(A))
   {
-    sp_mat X = as<arma::sp_mat>(A);
+    arma::sp_mat X = as<arma::sp_mat>(A);
     sum_vec = zeros(X.n_rows);
 
-    sp_mat::const_iterator it = X.begin();
-    sp_mat::const_iterator it_end = X.end();
+    arma::sp_mat::const_iterator it = X.begin();
+    arma::sp_mat::const_iterator it_end = X.end();
     for (; it != it_end; ++it)
     {
       sum_vec[it.row()] += (*it);
@@ -83,14 +83,14 @@ Rcpp::NumericVector fast_row_sums(SEXP &A)
 // [[Rcpp::export]]
 Rcpp::NumericVector fast_column_sums(SEXP &A)
 {
-  vec sum_vec;
+  arma::vec sum_vec;
   if (Rf_isS4(A))
   {
-    sp_mat X = as<arma::sp_mat>(A);
+    arma::sp_mat X = as<arma::sp_mat>(A);
     sum_vec = zeros(X.n_cols);
 
-    sp_mat::const_iterator it = X.begin();
-    sp_mat::const_iterator it_end = X.end();
+    arma::sp_mat::const_iterator it = X.begin();
+    arma::sp_mat::const_iterator it_end = X.end();
     for (; it != it_end; ++it)
     {
       sum_vec[it.col()] += (*it);
@@ -108,14 +108,14 @@ Rcpp::NumericVector fast_column_sums(SEXP &A)
 // [[Rcpp::export]]
 Rcpp::NumericVector fast_row_max(SEXP &A)
 {
-  vec sum_vec;
+  arma::vec sum_vec;
   if (Rf_isS4(A))
   {
-    sp_mat X = as<arma::sp_mat>(A);
+    arma::sp_mat X = as<arma::sp_mat>(A);
     sum_vec = zeros(X.n_rows);
 
-    sp_mat::const_iterator it = X.begin();
-    sp_mat::const_iterator it_end = X.end();
+    arma::sp_mat::const_iterator it = X.begin();
+    arma::sp_mat::const_iterator it_end = X.end();
     for (; it != it_end; ++it)
     {
       sum_vec[it.row()] = std::max(sum_vec[it.row()], (*it));
@@ -159,9 +159,9 @@ Rcpp::NumericVector computeSparseRowVariances(IntegerVector j,
 }
 
 // [[Rcpp::export]]
-sp_mat bind_sparse_mats(sp_mat &A, sp_mat &B, int dim = 0)
+arma::sp_mat bind_sparse_mats(arma::sp_mat &A, arma::sp_mat &B, int dim = 0)
 {
-  sp_mat C;
+  arma::sp_mat C;
   if (dim == 0)
   {
     C = join_cols(A, B);
