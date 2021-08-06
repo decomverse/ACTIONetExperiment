@@ -12,12 +12,12 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // roll_var
-vec roll_var(vec& X);
+arma::vec roll_var(arma::vec& X);
 RcppExport SEXP _ACTIONetExperiment_roll_var(SEXP XSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< vec& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type X(XSEXP);
     rcpp_result_gen = Rcpp::wrap(roll_var(X));
     return rcpp_result_gen;
 END_RCPP
@@ -70,13 +70,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // bind_sparse_mats
-sp_mat bind_sparse_mats(sp_mat& A, sp_mat& B, int dim);
+arma::sp_mat bind_sparse_mats(arma::sp_mat& A, arma::sp_mat& B, int dim);
 RcppExport SEXP _ACTIONetExperiment_bind_sparse_mats(SEXP ASEXP, SEXP BSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< sp_mat& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< sp_mat& >::type B(BSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type B(BSEXP);
     Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
     rcpp_result_gen = Rcpp::wrap(bind_sparse_mats(A, B, dim));
     return rcpp_result_gen;
