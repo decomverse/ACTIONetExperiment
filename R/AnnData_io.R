@@ -734,6 +734,9 @@ AnnData2ACE <- function(file,
             if ("encoding-type" %in% names(attr)) {
                 if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
                     Xr <- read.HD5SpMat(varm, nn, compression_level)
+                } else if (attr[["encoding-type"]] == "dataframe") {
+                    obj <- read.HD5DF(varm, nn, compression_level = compression_level)
+                    Xr <- Matrix::t(as.matrix(obj))
                 } else {
                     err <- sprintf("Error reading obsm %s", nn)
                     h5file$close_all()
