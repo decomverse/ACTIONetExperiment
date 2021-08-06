@@ -177,12 +177,11 @@ bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
   return x.first < y.first;
 }
 
-// [[Rcpp::export]]
 void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
                               NumericVector &Ax)
 {
   int n_row = Ap.size() - 1;
-  std::vector<std::pair<int, double> > temp;
+  std::vector<std::pair<int, double>> temp;
 
   for (int i = 0; i < n_row; i++)
   {
@@ -213,13 +212,12 @@ void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
   }
 }
 
-// [[Rcpp::export]]
 void csc_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Ai,
                               NumericVector &Ax)
 {
   int n_col = Ap.size() - 1;
 
-  std::vector<std::pair<int, double> > temp;
+  std::vector<std::pair<int, double>> temp;
   for (int i = 0; i < n_col; i++)
   {
     int col_start = (int)Ap[i];
