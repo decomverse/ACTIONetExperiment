@@ -171,6 +171,12 @@ sp_mat bind_sparse_mats(sp_mat &A, sp_mat &B, int dim = 0)
   return (C);
 }
 
+template <class T1, class T2>
+bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
+{
+  return x.first < y.first;
+}
+
 // [[Rcpp::export]]
 void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
                               NumericVector &Ax)
