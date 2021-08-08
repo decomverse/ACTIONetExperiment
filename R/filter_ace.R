@@ -36,6 +36,8 @@ get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, features_use = NU
     return(frac.list)
   } else {
     if (metric == "pct") {
+      frac <- 100 * cs_mm / cs_mat
+    } else if (metric == "frac") {
       frac <- cs_mm / cs_mat
     } else if (metric == "ratio") {
       frac <- cs_mm / (cs_mat - cs_mm)
