@@ -1,12 +1,10 @@
 #' @export
-get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, features_use = NULL, assay = "counts", species = c("mmusculus", "hsapiens", "other"), metric = c("pct", "ratio", "counts", "frac")) {
+get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, assay = "counts", species = c("mmusculus", "hsapiens", "other"), metric = c("pct", "ratio", "counts", "frac")) {
   require(stats)
   species <- match.arg(species)
   metric <- match.arg(metric)
 
-  features_use <- .preprocess_annotation_features(ace, features_use = features_use)
-
-  mask <- grepl("^MT[:.:]|^MT-", features_use, ignore.case = TRUE)
+  mask <- grepl("^MT[:.:]|^MT-", rownames(ace), ignore.case = TRUE)
 
   mat <- assays(ace)[[assay]]
   cs_mat <- fastColSums(mat)
