@@ -738,7 +738,7 @@ AnnData2ACE <- function(file,
                     obj <- read.HD5DF(varm, nn, compression_level = compression_level)
                     Xr <- Matrix::t(as.matrix(obj))
                 } else {
-                    err <- sprintf("Error reading obsm %s", nn)
+                    err <- sprintf("Error reading varm %s (encoding = %s)", nn, attr[["encoding-type"]])
                     h5file$close_all()
                     message(attr)
                     stop(err)
