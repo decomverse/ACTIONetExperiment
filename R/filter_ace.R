@@ -1,3 +1,47 @@
+#' @export
+get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, features_use = NULL, assay = "counts", species = c("mmusculus", "hsapiens", "other"), metric = c("pct", "ratio", "counts")) {
+  require(stats)
+  species <- match.arg(species)
+  metric <- match.arg(metric)
+
+  features_use <- .preprocess_annotation_features(ace, features_use = features_use)
+
+  mask <- grepl("^MT[:.:]|^MT-", features_use, ignore.case = TRUE)
+
+  mat <- assays(ace)[[assay]]
+  cs_mat <- fastColSums(mat)
+  mm <- mat[mask, , drop = F]
+  cs_mm <- fastColSums(mm)
+
+  if (!is.null(by)) {
+    IDX <- .get_attr_or_split_idx(ace, by, groups_use)
+
+    if (metric == "pct") {
+      frac.list <- lapply(IDX, function(idx) {
+        m <- cs_mm[idx] / cs_mat[idx]
+      })
+    } else if (metric == "ratio") {
+      frac.list <- lapply(IDX, function(idx) {
+        m <- cs_mm[idx] / (cs_mat[idx] - cs_mm[idx])
+      })
+    } else {
+      frac.list <- lapply(IDX, function(idx) {
+        m <- cs_mm[idx]
+      })
+    }
+    return(frac.list)
+  } else {
+    if (metric == "pct") {
+      frac <- cs_mm / cs_mat
+    } else if (metric == "ratio") {
+      frac <- cs_mm / (cs_mat - cs_mm)
+    } else {
+      frac <- cs_mm
+    }
+    return(frac)
+  }
+}
+
 #' Filter columns and rows of `ACTIONetExperiment` or `SummarizedExperiment`-like object.
 #' @export
 filter.ace <- function(ace,
