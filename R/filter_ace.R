@@ -1,5 +1,5 @@
 #' @export
-get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, features_use = NULL, assay = "counts", species = c("mmusculus", "hsapiens", "other"), metric = c("pct", "ratio", "counts")) {
+get_mtRNA_stats <- function(ace, by = NULL, groups_use = NULL, features_use = NULL, assay = "counts", species = c("mmusculus", "hsapiens", "other"), metric = c("pct", "ratio", "counts", "frac")) {
   require(stats)
   species <- match.arg(species)
   metric <- match.arg(metric)
