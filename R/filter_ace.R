@@ -72,7 +72,7 @@ filter.ace <- function(ace,
       groups_use = NULL,
       assay = assay_name,
       species = species,
-      metric = "pct",
+      metric = "frac",
       features_use = features_use
     )
 
