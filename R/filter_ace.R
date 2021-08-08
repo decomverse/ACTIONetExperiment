@@ -72,8 +72,7 @@ filter.ace <- function(ace,
       groups_use = NULL,
       assay = assay_name,
       species = species,
-      metric = "frac",
-      features_use = features_use
+      metric = "frac"
     )
 
     mask <- mt_frac <= max_mito_fraction
