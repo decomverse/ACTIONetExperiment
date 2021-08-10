@@ -14,9 +14,9 @@
 #' @export
 import.ace.from.10X.generic <- function(
   input_path,
-  mtx_file = "matrix.mtx",
-  feature_metadata = "features.tsv",
-  sample_metadata = "barcodes.tsv",
+  mtx_file = "matrix.mtx.gz",
+  feature_metadata = "features.tsv.gz",
+  sample_metadata = "barcodes.tsv.gz",
   sep = "\t",
   use.names = TRUE,
   prefilter = FALSE,
@@ -68,6 +68,8 @@ import.ace.from.10X.generic <- function(
         colnames(colAnnot) = sample_metadata[1, ]
     } else {
         colAnnot = S4Vectors::DataFrame(sample_metadata)
+        if(NCOL(colAnnot) == 1)
+          colnames(colAnnot) = "Barcode"
     }
 
     # Feature-barcoding
@@ -138,13 +140,13 @@ import.ace.from.10X <- function(
     }
 
     if ((2 <= version) & (version < 3)) {
-        mtx_file = "matrix.mtx"
-        feature_metadata = "genes.tsv"
-        sample_metadata = "barcodes.tsv"
+        mtx_file = "matrix.mtx.gz"
+        feature_metadata = "genes.tsv.gz"
+        sample_metadata = "barcodes.tsv.gz"
     } else if ((3 <= version) & (version < 4)) {
-        mtx_file = "matrix.mtx"
-        feature_metadata = "features.tsv"
-        sample_metadata = "barcodes.tsv"
+        mtx_file = "matrix.mtx.gz"
+        feature_metadata = "features.tsv.gz"
+        sample_metadata = "barcodes.tsv.gz"
     } else {
         message("Unknown version")
     }
