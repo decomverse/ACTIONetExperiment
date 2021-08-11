@@ -476,8 +476,8 @@ ACE2AnnData <- function(ace,
             nn <- names(obsm.subset)[[i]]
             Y <- Matrix::t(obsm.subset[[i]])
             if (NROW(Y) <= 3) {
-                # AD_nn = paste("X", nn, sep = "_")
-                AD_nn <- nn
+                AD_nn <- paste("X", nn, sep = "_")
+                # AD_nn <- nn
             } else {
                 AD_nn <- nn
             }
