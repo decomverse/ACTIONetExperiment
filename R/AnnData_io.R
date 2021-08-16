@@ -49,7 +49,9 @@ write.HD5DF <- function(h5file,
         noncat.vars <- setdiff(1:NCOL(DF), cat.vars)
         if (length(noncat.vars) > 0) {
             noncat.num.vars <- noncat.vars[sapply(noncat.vars, function(i) {
-                x <- as.numeric(DF[, i])
+                suppressWarnings({
+                    x <- as.numeric(as.character(DF[, i]))
+                })
                 return(sum(!is.na(x)) > 0)
             })]
         } else {
@@ -65,16 +67,15 @@ write.HD5DF <- function(h5file,
         # cn = colnames(DF)[c(cat.vars, noncat.num.vars)]
         cn <- colnames(DF)
         catDF <- DF[, cat.vars, drop = F]
-        catDF <- apply(catDF, 2, as.character)
-        catDF[is.na(catDF)] <- "NA"
+        # catDF[is.na(catDF)] <- "NA"
 
         numDF <- DF[, noncat.num.vars, drop = F]
-        numDF <- apply(numDF, 2, as.numeric)
-        numDF[is.na(numDF)] <- NA
+        numDF <- apply(numDF, 2, function(x) as.numeric(as.character(x)))
+        # numDF[is.na(numDF)] <- "NA"
 
         nonNumDF <- DF[, noncat.nonnum.vars, drop = F]
         nonNumDF <- apply(nonNumDF, 2, as.character)
-        nonNumDF[is.na(nonNumDF)] <- NA
+        # nonNumDF[is.na(nonNumDF)] <- "NA"
 
         if (length(cn) == 0) {
             dtype <- H5T_STRING$new(type = "c", size = Inf)
