@@ -42,23 +42,23 @@ write.HD5DF <- function(h5file,
 
     if (0 < NCOL(DF)) {
         cat.vars <- which(sapply(1:NCOL(DF), function(i) {
-            x = DF[, i]
+            x <- DF[, i]
             suppressWarnings({
                 y <- as.numeric(as.character(x))
             })
-            is.truly.numeric = (sum(is.na(x)) == sum(is.na(y)))
-            has.limited.levels = (length(unique(DF[, i])) < 256)
-            !is.truly.numeric & has.limited.levels                        
+            is.truly.numeric <- (sum(is.na(x)) == sum(is.na(y)))
+            has.limited.levels <- (length(unique(DF[, i])) < 256)
+            !is.truly.numeric & has.limited.levels
         }))
 
         noncat.vars <- setdiff(1:NCOL(DF), cat.vars)
         if (length(noncat.vars) > 0) {
             noncat.num.vars <- noncat.vars[sapply(noncat.vars, function(i) {
-                x = DF[, i]
+                x <- DF[, i]
                 suppressWarnings({
                     y <- as.numeric(as.character(x))
                 })
-                is.truly.numeric = (sum(is.na(x)) == sum(is.na(y)))
+                is.truly.numeric <- (sum(is.na(x)) == sum(is.na(y)))
                 return(is.truly.numeric)
             })]
         } else {
@@ -126,7 +126,7 @@ write.HD5DF <- function(h5file,
                 attr$write(0)
 
                 l.vec <- h5group$create_dataset(colnames(DF)[cat.vars[i]], as.integer(v),
-                    gzip_level = compression_level, dtype = h5types$H5T_NATIVE_INT8
+                    gzip_level = compression_level, dtype = h5types$H5T_NATIVE_UINT8
                 )
 
                 ref <- cat$create_reference(name = colnames(DF)[cat.vars[i]])
