@@ -616,10 +616,10 @@ AnnData2ACE <- function(file,
         if (length(X.attr) == 0) {
             # Full matrix
             X <- h5file[["X"]]$read()
-            sub.samples <- unique(X[1:1000, 1])
+            sub.samples <- unique(X[1:min(1000, nrow(X)), 1])
         } else {
             X <- read.HD5SpMat(h5file = h5file, gname = "X")
-            sub.samples <- unique(X@x[1:1000])
+            sub.samples <- unique(X@x[1:min(1000, nrow(X))])
         }
         if (is.null(main_assay)) {
             if (sum(round(sub.samples) != sub.samples) == 0) {
