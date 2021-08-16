@@ -42,17 +42,24 @@ write.HD5DF <- function(h5file,
 
     if (0 < NCOL(DF)) {
         cat.vars <- which(sapply(1:NCOL(DF), function(i) {
-            length(unique(DF[, i])) <
-                256
+            x = DF[, i]
+            suppressWarnings({
+                y <- as.numeric(as.character(x))
+            })
+            is.truly.numeric = (sum(is.na(x)) == sum(is.na(y)))
+            has.limited.levels = (length(unique(DF[, i])) < 256)
+            !is.truly.numeric & has.limited.levels                        
         }))
 
         noncat.vars <- setdiff(1:NCOL(DF), cat.vars)
         if (length(noncat.vars) > 0) {
             noncat.num.vars <- noncat.vars[sapply(noncat.vars, function(i) {
+                x = DF[, i]
                 suppressWarnings({
-                    x <- as.numeric(as.character(DF[, i]))
+                    y <- as.numeric(as.character(x))
                 })
-                return(sum(!is.na(x)) > 0)
+                is.truly.numeric = (sum(is.na(x)) == sum(is.na(y)))
+                return(is.truly.numeric)
             })]
         } else {
             noncat.num.vars <- noncat.vars
