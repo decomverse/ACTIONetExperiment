@@ -483,7 +483,8 @@ ACE2AnnData <- function(ace,
         for (i in 1:length(obsm.subset)) {
             nn <- names(obsm.subset)[[i]]
             Y <- Matrix::t(obsm.subset[[i]])
-            if (NROW(Y) <= 3) {
+            isDimRed <- (NROW(Y) <= 3) | (colMapTypes(ace)[[nn]] == "embedding")
+            if (isDimRed) {
                 AD_nn <- paste("X", nn, sep = "_")
                 # AD_nn <- nn
             } else {
@@ -722,12 +723,17 @@ AnnData2ACE <- function(file,
                 Xr <- obsm[[mn]]$read()
             }
 
+            isDimRed <- FALSE
             if (sum(grepl(pattern = "^X_", mn))) {
                 nn <- stringr::str_sub(mn, start = 3)
+                isDimRed <- TRUE
             } else {
                 nn <- mn
             }
             colMaps(ace)[[nn]] <- Matrix::t(Xr)
+            if (isDimRed) {
+                colMapTypes(ace)[[nn]] <- "embedding"
+            }
             rm(Xr)
             invisible(gc())
         }
