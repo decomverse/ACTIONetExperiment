@@ -102,7 +102,7 @@ write.HD5DF <- function(h5file,
             for (i in 1:length(cat.vars)) {
                 x <- catDF[, i] # DF[, cat.vars[i]]
                 if (class(x) == "factor") {
-                    x = droplevels(x)
+                    x <- droplevels(x)
                     l <- as.character(levels(x))
                     v <- as.numeric(x) - 1
                 } else {
@@ -270,10 +270,6 @@ read.HD5DF <- function(h5file,
             for (nn in names(cat)) {
                 l <- cat[[nn]]$read()
                 l <- setdiff(l, "NA")
-                if (length(l) < 2) {
-                      next
-                  }
-
                 vars[[nn]] <- factor(l[vars[[nn]] + 1], l)
             }
         }
