@@ -268,13 +268,12 @@ read.HD5DF <- function(h5file,
         if ("__categories" %in% names(h5group)) {
             cat <- h5group[["__categories"]]
             for (nn in names(cat)) {
+                if (!(nn %in% column.names)) {
+                      next
+                  }
                 l <- cat[[nn]]$read()
                 # l <- setdiff(l, "NA")
-                if (length(unique(l)) == length(l)) {
-                      vars[[nn]] <- l
-                  } else {
-                      vars[[nn]] <- factor(l[vars[[nn]] + 1], l)
-                  }
+                vars[[nn]] <- factor(l[vars[[nn]] + 1], l)
             }
         }
         DF <- DataFrame(vars)
