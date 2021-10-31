@@ -48,6 +48,5 @@ revert_ace_as_sce <- function(ace) {
         colData = SummarizedExperiment::colData(ace),
         rowData = SummarizedExperiment::rowData(ace)
     )
-
     return(sce)
 }
