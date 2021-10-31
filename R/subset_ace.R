@@ -4,56 +4,58 @@
 #'
 #' @export
 setMethod("[", c("ACTIONetExperiment", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE) {
-    rn <- x@rowNets
-    cn <- x@colNets
-    rf <- x@rowMaps
-    cf <- x@colMaps
-    
+
+    assays.list = as(x@assays, "SimpleList")
+    rnets <- x@rowNets
+    cnets <- x@colNets
+    rmaps <- x@rowMaps
+    cmaps <- x@colMaps
+
     if (!missing(i)) {
         if (is.character(i)) {
             fmt <- paste0("<", class(x), ">[i,] index out of bounds: %s")
-            i <- SummarizedExperiment:::.SummarizedExperiment.charbound(i, rownames(x), 
+            i <- SummarizedExperiment:::.SummarizedExperiment.charbound(i, rownames(x),
                 fmt)
         }
         i <- as.vector(i)
-        
-        if (length(rn) > 0) {
-            for (k in 1:length(rn)) {
-                tmp = rn[[k]]
-                rn[[k]] = tmp[i, i]
+
+        if (length(rnets) > 0) {
+            for (k in 1:length(rnets)) {
+                tmp = rnets[[k]]
+                rnets[[k]] = tmp[i, i]
             }
         }
-        if (length(rf) > 0) {
-            for (k in 1:length(rf)) {
-                tmp = rf[[k]]
-                rf[[k]] = tmp[i, , drop = FALSE]
+        if (length(rmaps) > 0) {
+            for (k in 1:length(rmaps)) {
+                tmp = rmaps[[k]]
+                rmaps[[k]] = tmp[i, , drop = FALSE]
             }
         }
     }
-    
+
     if (!missing(j)) {
         if (is.character(j)) {
             fmt <- paste0("<", class(x), ">[,j] index out of bounds: %s")
-            j <- SummarizedExperiment:::.SummarizedExperiment.charbound(j, colnames(x), 
+            j <- SummarizedExperiment:::.SummarizedExperiment.charbound(j, colnames(x),
                 fmt)
         }
         j <- as.vector(j)
-        
-        if (length(cn) > 0) {
-            for (k in 1:length(cn)) {
-                tmp = cn[[k]]
-                cn[[k]] = tmp[j, j]
+
+        if (length(cnets) > 0) {
+            for (k in 1:length(cnets)) {
+                tmp = cnets[[k]]
+                cnets[[k]] = tmp[j, j]
             }
         }
-        if (length(cf) > 0) {
-            for (k in 1:length(cf)) {
-                tmp = cf[[k]]
-                cf[[k]] = tmp[j, , drop = FALSE]
+        if (length(cmaps) > 0) {
+            for (k in 1:length(cmaps)) {
+                tmp = cmaps[[k]]
+                cmaps[[k]] = tmp[j, , drop = FALSE]
             }
         }
     }
-    
+
     out <- callNextMethod()
-    BiocGenerics:::replaceSlots(out, rowNets = rn, colNets = cn, rowMaps = rf, colMaps = cf, 
+    BiocGenerics:::replaceSlots(out, rowNets = rnets, colNets = cnets, rowMaps = rmaps, colMaps = cmaps,
         check = FALSE)
 })

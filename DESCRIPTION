@@ -1,27 +1,23 @@
 Package: ACTIONetExperiment
 Type: Package
-Title: Extension of the SummarizedExperiment object to match with Python AnnData
-Version: 2.1.4
-Date: 2021-06-07
+Title: ACTIONetExperiment container object
+Version: 1.0.0
+Date: 2021-10-30
 Authors@R: c(
     person("Shahin", "Mohammadi", email = "shahin.mohammadi@gmail.com",
         role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8734-2326")),
     person("Sebastian", "Pineda", email = "sebastianpineda95@gmail.com",
-            role = "aut", comment = c(ORCID = "0000-0002-8903-0550")),
-    person("Jose", "Davila-Velderrain", email = "jdjosedavila@gmail.com",
-        role = "aut", comment = c(ORCID = "")),
-    person("Anna", "Shcherbina", email = "annashch@stanford.edu",
-        role = "aut", comment = c(ORCID = ""))
+            role = "aut", comment = c(ORCID = "0000-0002-8903-0550"))
     )
 Maintainer: Shahin Mohammadi <shahin.mohammadi@gmail.com>
 Description:
 License: GPL (>= 2)
 URL: https://github.com/shmohammadi86/ACTIONet
-Depends: R (>= 4.0.0), Matrix, S4Vectors, BiocGenerics, SummarizedExperiment, SingleCellExperiment, BiocParallel, hdf5r
+Depends: R (>= 4.0.0), Matrix, S4Vectors, BiocGenerics, SummarizedExperiment, SingleCellExperiment, hdf5r
 Imports: Rcpp, RcppArmadillo
-Suggests: metap, multtest, ComplexHeatmap, limma, ineq
+Suggests:
 LinkingTo: Rcpp,RcppArmadillo
 biocViews: ACTION, ACTIONet, ACTIONetExperiment
 Encoding: UTF-8
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

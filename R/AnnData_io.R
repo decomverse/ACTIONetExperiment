@@ -12,7 +12,6 @@ h5addAttr.str <- function(h5group, attr.name, attr.val) {
 #' @import hdf5r
 h5addAttr.str_array <- function(h5group, attr.name, attr.val) {
 
-    # dtype <- guess_dtype(x=attr.val, scalar=F, string_len=Inf)
     dtype <- H5T_STRING$new(type = "c", size = Inf)
     dtype <- dtype$set_cset(cset = "UTF-8")
 
@@ -44,32 +43,10 @@ write.HD5DF <- function(
     h5addAttr.str(h5group, "encoding-type", "dataframe")
 
     if (0 < NCOL(DF)) {
-      noncat.num.vars = which(apply(DF, 2, is.numeric))
-      # cat.vars = which(apply(DF, 2, function(x) length(unique(x)) < 256))
-      cat.vars = which(apply(DF, 2, function(x) length(unique(x)) < 128))
-      cat.vars = setdiff(cat.vars, noncat.num.vars)
-      noncat.vars = setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
-        # cat.vars = which(sapply(1:NCOL(DF), function(i) length(unique(DF[, i])) <
-        #     256))
-
-        # noncat.vars = setdiff(1:NCOL(DF), cat.vars)
-        # if (length(noncat.vars) > 0) {
-        #     noncat.num.vars = noncat.vars[sapply(noncat.vars, function(i) {
-        #         x = as.numeric(DF[, i])
-        #         return(sum(!is.na(x)) > 0)
-        #     })]
-        #
-        # } else {
-        #     noncat.num.vars = noncat.vars
-        # }
-
-        # noncat.nonnum.vars = setdiff(noncat.vars, noncat.num.vars)
-
-        # if (length(cat.vars) > 0) {
-        #     cat.vars = setdiff(cat.vars, noncat.num.vars)
-        # }
-
-        # cn = colnames(DF)[c(cat.vars, noncat.num.vars)]
+        noncat.num.vars = which(apply(DF, 2, is.numeric))
+        cat.vars = which(apply(DF, 2, function(x) length(unique(x)) < 128))
+        cat.vars = setdiff(cat.vars, noncat.num.vars)
+        noncat.vars = setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
         cn = colnames(DF)
         catDF = DF[, cat.vars, drop = FALSE]
         catDF = apply(catDF, 2, as.character)
@@ -80,7 +57,6 @@ write.HD5DF <- function(
         numDF[is.na(numDF)] = NA
 
         nonNumDF = DF[, noncat.vars, drop = FALSE]
-        # nonNumDF = DF[, noncat.nonnum.vars, drop = FALSE]
         nonNumDF = apply(nonNumDF, 2, as.character)
         nonNumDF[is.na(nonNumDF)] = NA
 
@@ -91,7 +67,6 @@ write.HD5DF <- function(
 
             h5group$create_attr(attr_name = "column-order", dtype = dtype, space = space)
 
-            # attr = h5group$attr_open_by_name(attr_name = 'column-order', '.') attr$write()
         } else {
             h5addAttr.str_array(h5group, "column-order", cn)
         }
@@ -100,17 +75,9 @@ write.HD5DF <- function(
             cat = h5group$create_group("__categories")
 
             for (i in 1:length(cat.vars)) {
-                x = catDF[, i]  #DF[, cat.vars[i]]
+                x = catDF[, i]
                 l = sort(unique(x))
                 v = match(x, l) - 1
-                # if (class(x) == "factor") {
-                #   l = as.character(levels(x))
-                #   v = as.numeric(x) - 1
-                # } else {
-                #   x = as.character(x)
-                #   l = sort(unique(x))
-                #   v = match(x, l) - 1
-                # }
 
                 dtype = H5T_STRING$new(type = "c", size = Inf)
                 dtype = dtype$set_cset(cset = "UTF-8")
@@ -148,7 +115,6 @@ write.HD5DF <- function(
             }
         }
 
-        # if (length(noncat.nonnum.vars) > 0) {
         if (length(noncat.vars) > 0) {
             for (i in 1:NCOL(nonNumDF)) {
                 x = nonNumDF[, i]
@@ -196,12 +162,15 @@ write.HD5SpMat <- function(h5file,
 }
 
 #' @import hdf5r
-write.HD5List <- function(h5file,
-                          gname,
-                          obj_list,
-                          depth = 1,
-                          max_depth = 5,
-                          compression_level = 0) {
+write.HD5List <- function(
+  h5file,
+  gname,
+  obj_list,
+  depth = 1,
+  max_depth = 5,
+  compression_level = 0
+) {
+
     h5group <- h5file$create_group(gname)
 
     obj_list <- as.list(obj_list)
@@ -233,9 +202,12 @@ write.HD5List <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5DF <- function(h5file,
-                       gname,
-                       compression_level = 0) {
+read.HD5DF <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+
     h5group <- h5file[[gname]]
 
     if (!(h5group$attr_open_by_name("encoding-type", ".")$read() == "dataframe")) {
@@ -268,7 +240,6 @@ read.HD5DF <- function(h5file,
                     next
                 }
                 l <- cat[[nn]]$read()
-                # l <- setdiff(l, "NA")
                 vars[[nn]] <- factor(l[vars[[nn]] + 1], l)
             }
         }
@@ -282,9 +253,12 @@ read.HD5DF <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5SpMat <- function(h5file,
-                          gname,
-                          compression_level = 0) {
+read.HD5SpMat <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+
     h5group <- h5file[[gname]]
     attr <- h5attributes(h5group)
     if (!(("encoding-type" %in% names(attr)) & (attr[["encoding-type"]] %in% c(
@@ -307,8 +281,6 @@ read.HD5SpMat <- function(h5file,
         rm(Xt)
         invisible(gc())
     } else if (attr[["encoding-type"]] == "csr_matrix") {
-        # csr_sort_indices_inplace(indptr, indices, data) Xt = new('dgRMatrix', j =
-        # indices, p = indptr, x = data, Dim = Dims) X = Matrix::t(Xt)
         csc_sort_indices_inplace(indptr, indices, data)
         Xt <- Matrix::sparseMatrix(j = indices + 1, p = indptr, x = data, dims = Dims)
         X <- Matrix::t(Xt)
@@ -320,13 +292,15 @@ read.HD5SpMat <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5List <- function(h5file,
-                         gname,
-                         depth = 1,
-                         max_depth = 5,
-                         compression_level = 0) {
-    h5group <- h5file[[gname]]
+read.HD5List <- function(
+  h5file,
+  gname,
+  depth = 1,
+  max_depth = 5,
+  compression_level = 0
+) {
 
+    h5group <- h5file[[gname]]
 
     obj_names <- names(h5group)
     L.out <- vector("list", length(obj_names))
@@ -366,11 +340,14 @@ read.HD5List <- function(h5file,
 
 #' @import hdf5r
 #' @export
-ACE2AnnData <- function(ace,
-                        file,
-                        main_assay = "logcounts",
-                        full.export = TRUE,
-                        compression_level = 0) {
+ACE2AnnData <- function(
+  ace,
+  file,
+  main_assay = "logcounts",
+  full.export = TRUE,
+  compression_level = 0
+) {
+
     .check_and_load_package("hdf5r")
 
     # Ensure it can be case as an ACE object
@@ -387,14 +364,6 @@ ACE2AnnData <- function(ace,
         rownames(ace) <- .default_rownames(NROW(ace))
     }
 
-    # Error is no assay specified.
-    # assay_opts = c(main_assay, raw_assay)
-    # if (!(main_assay %in% names(SummarizedExperiment::assays(ace)))) {
-    #     err = sprintf("Invalid valid assay selection.\n")
-    #     stop(err)
-    # }
-
-    # Make row/column-names unique
     colnames(ace) <- ucn <- .make_chars_unique(colnames(ace))
     rownames(ace) <- urn <- .make_chars_unique(rownames(ace))
 

@@ -37,12 +37,6 @@ fastRowVars <- function(mat) {
 }
 
 #' @export
-fastBindSparse <- function(A, B, d = 1) {
-    d <- d - 1
-    sp_mat <- bind_sparse_mats(A, B, d)
-    return(sp_mat)
-}
-
 is.sparseMatrix <- function(A) {
     return(length(which(is(A) == "sparseMatrix")) != 0)
 }
