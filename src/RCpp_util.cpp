@@ -32,28 +32,6 @@ Rcpp::NumericVector arma2vec(const T &x)
   return Rcpp::NumericVector(x.begin(), x.end());
 }
 
-// [[Rcpp::export]]
-arma::vec roll_var(arma::vec &X)
-{
-  const uword n_max = X.n_elem;
-  double xbar = 0, M = 0;
-  arma::vec out(n_max);
-  double *x = X.begin(), *o = out.begin();
-
-  for (uword n = 1; n <= n_max; ++n, ++x, ++o)
-  {
-    double tmp = (*x - xbar);
-    xbar += (*x - xbar) / n;
-    M += tmp * (*x - xbar);
-    if (n > 1L)
-      *o = M / (n - 1.);
-  }
-
-  if (n_max > 0)
-    out[0] = std::numeric_limits<double>::quiet_NaN();
-
-  return out;
-}
 
 // [[Rcpp::export]]
 Rcpp::NumericVector fast_row_sums(SEXP &A)
@@ -130,45 +108,18 @@ Rcpp::NumericVector fast_row_max(SEXP &A)
   return (arma2vec(sum_vec));
 }
 
-// Adapted from
-// https://github.com/GreenleafLab/MPAL-Single-Cell-2019/blob/master/scRNA_02_Cluster_Disease_w_Reference_v1.R
-// [[Rcpp::export]]
-Rcpp::NumericVector computeSparseRowVariances(IntegerVector j,
-                                              NumericVector val,
-                                              NumericVector rm, int n)
+template <typename T>
+T bind_mats_generic(const T &A, const T &B, int dim)
 {
-  const int nv = j.size();
-  const int nm = rm.size();
-  Rcpp::NumericVector rv(nm);
-  Rcpp::NumericVector rit(nm);
-  int current;
-  // Calculate RowVars Initial
-  for (int i = 0; i < nv; ++i)
-  {
-    current = j(i) - 1;
-    rv(current) = rv(current) + (val(i) - rm(current)) * (val(i) - rm(current));
-    rit(current) = rit(current) + 1;
-  }
-  // Calculate Remainder Variance
-  for (int i = 0; i < nm; ++i)
-  {
-    rv(i) = rv(i) + (n - rit(i)) * rm(i) * rm(i);
-  }
-  rv = rv / (n - 1);
-  return (rv);
-}
+  T C;
 
-// [[Rcpp::export]]
-arma::sp_mat bind_sparse_mats(arma::sp_mat &A, arma::sp_mat &B, int dim = 0)
-{
-  arma::sp_mat C;
   if (dim == 0)
   {
-    C = join_cols(A, B);
+    C = join_vert(A, B);
   }
   else if (dim == 1)
   {
-    C = join_rows(A, B);
+    C = join_horiz(A, B);
   }
   else
   {
@@ -177,6 +128,34 @@ arma::sp_mat bind_sparse_mats(arma::sp_mat &A, arma::sp_mat &B, int dim = 0)
   return (C);
 }
 
+template arma::mat bind_mats_generic<arma::mat>(const arma::mat &A, const arma::mat &B, int dim);
+template arma::sp_mat bind_mats_generic<arma::sp_mat>(const arma::sp_mat &A, const arma::sp_mat &B, int dim);
+
+// [[Rcpp::export]]
+arma::sp_mat bind_mats_sparse(SEXP &X1, SEXP &X2, int dim = 0){
+  arma::sp_mat X = bind_mats_generic<arma::sp_mat>(as<arma::sp_mat>(X1), as<arma::sp_mat>(X2), dim);
+  return (X);
+}
+// [[Rcpp::export]]
+arma::mat bind_mats_dense(SEXP &X1, SEXP &X2, int dim = 0){
+  arma::mat X = bind_mats_generic<arma::mat>(as<arma::mat>(X1), as<arma::mat>(X2), dim);
+  return (X);
+}
+
+// ###################################################################
+
+// arma::sp_mat subset_sparse(const arma::sp_mat& X,const arma::uvec& index) {
+//
+// arma::sp_mat col_sp(const arma::sp_mat& X,const arma::uvec& index) {
+// int n_cols = index.n_elem;
+// arma::sp_mat x_subset(X.n_rows,index.n_elem);
+// for(int i=0; i<n_cols; i++){
+//     x_subset.col(i) = X.col(index(i));
+// }
+// return x_subset;}
+
+// ###################################################################
+
 template <class T1, class T2>
 bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
 {
@@ -184,8 +163,8 @@ bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
 }
 
 // [[Rcpp::export]]
-void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
-                              NumericVector &Ax)
+void csr_sort_indices_inplace(Rcpp::IntegerVector &Ap, Rcpp::IntegerVector &Aj,
+                              Rcpp::NumericVector &Ax)
 {
   int n_row = Ap.size() - 1;
   std::vector<std::pair<int, double>> temp;
@@ -220,8 +199,8 @@ void csr_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Aj,
 }
 
 // [[Rcpp::export]]
-void csc_sort_indices_inplace(IntegerVector &Ap, IntegerVector &Ai,
-                              NumericVector &Ax)
+void csc_sort_indices_inplace(Rcpp::IntegerVector &Ap, Rcpp::IntegerVector &Ai,
+                              Rcpp::NumericVector &Ax)
 {
   int n_col = Ap.size() - 1;
 

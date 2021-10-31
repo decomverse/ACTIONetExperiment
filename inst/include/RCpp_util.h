@@ -1,15 +1,23 @@
 #ifndef RCPP_UTIL_H
 #define RCPP_UTIL_H
 
-template <typename T>
-Rcpp::NumericVector arma2vec(const T &x);
-arma::vec roll_var(arma::vec &X);
-Rcpp::NumericVector fast_row_sums(SEXP &A);
-Rcpp::NumericVector fast_column_sums(SEXP &A);
-Rcpp::NumericVector computeSparseRowVariances(Rcpp::IntegerVector j,
-                                              Rcpp::NumericVector val,
-                                              Rcpp::NumericVector rm, int n);
-arma::sp_mat bind_sparse_mats(sp_mat &A, sp_mat &B, int dim);
+namespace ACTIONetExperiment
+{
+  template <typename T>
+  // Rcpp::NumericVector arma2vec(const T &x);
+  Rcpp::NumericVector fast_row_sums(SEXP &A);
+  Rcpp::NumericVector fast_column_sums(SEXP &A);
+  Rcpp::NumericVector fast_row_max(SEXP &A);
+  arma::sp_mat bind_mats_sparse(SEXP &X1, SEXP &X2, int dim);
+  arma::mat bind_mats_dense(SEXP &X1, SEXP &X2, int dim);
 
+  template <typename T>
+  T bind_mats_generic(const SEXP &X1, const SEXP &X2, int dim);
+  //
+  template <class T1, class T2>
+  bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y);
 
+  void csr_sort_indices_inplace(Rcpp::IntegerVector &Ap, Rcpp::IntegerVector &Aj, Rcpp::NumericVector &Ax);
+  void csc_sort_indices_inplace(Rcpp::IntegerVector &Ap, Rcpp::IntegerVector &Ai, Rcpp::NumericVector &Ax);
+}
 #endif

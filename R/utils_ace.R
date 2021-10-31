@@ -1,13 +1,3 @@
-.check_and_load_package <- function(pkg_names) {
-    for (pk in pkg_names) {
-        if (!require(pk, character.only = T)) {
-            err <- sprintf("Package '%s' is not installed.\n", pk)
-            stop(err)
-        }
-    }
-}
-
-
 ## Default ACE values
 .default_rowData <- function(d) {
     DF <- DataFrame(feature_name = paste0("feat_", 1:d))
@@ -118,4 +108,59 @@
     } else {
         return(IDX_out)
     }
+}
+
+.fast_bind_sparse_rows <- function(A, B) {
+    sp_mat <- bind_mats_sparse(A, B, 0)
+    return(sp_mat)
+}
+
+.fast_bind_sparse_cols <- function(A, B) {
+    sp_mat <- bind_mats_sparse(A, B, 1)
+    return(sp_mat)
+}
+
+.fast_bind_dense_rows <- function(A, B) {
+    mat <- bind_mats_dense(A, B, 0)
+    return(mat)
+}
+
+.fast_bind_dense_cols <- function(A, B) {
+    mat <- bind_mats_dense(A, B, 1)
+    return(mat)
+}
+
+.fast_bind_generic <- function(..., d = 1){
+
+  args <- list(...)
+  if(!(d %in% c(1,2)) ){
+    stop("Invalid 'dim'")
+  }
+
+  if( any(sapply(args, is.sparseMatrix)) ){
+    args = lapply(args, function(x) as(x, "sparseMatrix"))
+    out = switch(
+      d,
+      Reduce(.fast_bind_sparse_rows, args),
+      Reduce(.fast_bind_sparse_cols, args)
+    )
+  } else {
+    args = lapply(args, function(x) as.matrix(x))
+    out = switch(
+      d,
+      Reduce(.fast_bind_dense_rows, args),
+      Reduce(.fast_bind_dense_cols, args)
+    )
+  }
+  return(out)
+}
+
+armaBindRows <- function(...){
+  out <- .fast_bind_generic(..., d = 1)
+  return(out)
+}
+
+armaBindCols <- function(...){
+  out <- .fast_bind_generic(..., d = 2)
+  return(out)
 }
