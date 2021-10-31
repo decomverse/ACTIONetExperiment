@@ -142,20 +142,6 @@ arma::mat bind_mats_dense(SEXP &X1, SEXP &X2, int dim = 0){
   return (X);
 }
 
-// ###################################################################
-
-// arma::sp_mat subset_sparse(const arma::sp_mat& X,const arma::uvec& index) {
-//
-// arma::sp_mat col_sp(const arma::sp_mat& X,const arma::uvec& index) {
-// int n_cols = index.n_elem;
-// arma::sp_mat x_subset(X.n_rows,index.n_elem);
-// for(int i=0; i<n_cols; i++){
-//     x_subset.col(i) = X.col(index(i));
-// }
-// return x_subset;}
-
-// ###################################################################
-
 template <class T1, class T2>
 bool kv_pair_less(const std::pair<T1, T2> &x, const std::pair<T1, T2> &y)
 {

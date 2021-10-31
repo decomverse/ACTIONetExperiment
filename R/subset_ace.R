@@ -4,8 +4,7 @@
 #'
 #' @export
 setMethod("[", c("ACTIONetExperiment", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE) {
-
-    assays.list = as(x@assays, "SimpleList")
+  
     rnets <- x@rowNets
     cnets <- x@colNets
     rmaps <- x@rowMaps
