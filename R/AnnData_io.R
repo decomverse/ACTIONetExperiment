@@ -414,15 +414,6 @@ ACE2AnnData <- function(
 
     ## Write obs (colData() in ace)
     obs.DF <- as.data.frame(SummarizedExperiment::colData(ace))
-    if (0 < NCOL(obs.DF)) {
-        obs.DF <- as.data.frame(lapply(SummarizedExperiment::colData(ace), function(x) {
-            if (is.numeric(x) & (!is.null(names(x)))) {
-                return(factor(names(x), names(x)[match(unique(x), x)]))
-            } else {
-                return(x)
-            }
-        }))
-    }
     rownames(obs.DF) <- colnames(ace)
 
     write.HD5DF(h5file, gname = "obs", obs.DF, compression_level = compression_level)

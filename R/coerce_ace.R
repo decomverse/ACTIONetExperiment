@@ -92,7 +92,7 @@ as.SummarizedExperiment <- function(ace) {
     rownames(SE) = rownames(ace)
 
     return(SE)
-}
+} # Add reducedDims, colPairs, rowPairs
 
 #' Converts an ACTIONetExperiment object to a SingleCellExperiment object.
 #'
