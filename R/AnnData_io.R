@@ -29,26 +29,6 @@ write.HD5DF <- function(h5file,
     string.dtype <- string.dtype$set_cset(cset = "UTF-8")
 
     DF <- as.data.frame(DF)
-    DF <- apply(DF, 2, function(x) {
-        if (is.factor(x)) {
-            return(x)
-        } else if (is.character(x)) {
-            suppressWarnings({
-                x.num <- as.numeric(x)
-            })
-            if ((sum(is.na(x.num)) / length(x.num)) < 0.5) {
-                return(x.num)
-            } else {
-                UL <- sort(unique(x))
-                if (length(UL) < 256) {
-                    x.factor <- factor(x, UL)
-                    return(x.factor)
-                } else {
-                    return(x)
-                }
-            }
-        }
-    })
 
     N <- NROW(DF)
 
@@ -59,8 +39,8 @@ write.HD5DF <- function(h5file,
     h5addAttr.str(h5group, "encoding-type", "dataframe")
 
     if (0 < NCOL(DF)) {
-        noncat.num.vars <- which(apply(DF, 2, is.numeric))
-        cat.vars <- which(apply(DF, 2, function(x) length(unique(x)) < 128))
+        noncat.num.vars <- which(sapply(DF, is.numeric))
+        cat.vars <- which(sapply(DF, function(x) length(unique(x)) < 256))
         cat.vars <- setdiff(cat.vars, noncat.num.vars)
         noncat.vars <- setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
         cn <- colnames(DF)
