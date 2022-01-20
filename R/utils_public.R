@@ -79,7 +79,10 @@ get.data.or.split <- function(
     if (is.null(data_vec)) {
         stop(sprintf("Invalid split conditions.\n"))
     } else {
-        data_vec <- as.character(data_vec)
+      if (is.factor(data_vec)){
+        data_vec = as.character(data_vec)
+      }
+        data_vec = data_vec
     }
 
     idx <- 1:dim(ace)[d]
