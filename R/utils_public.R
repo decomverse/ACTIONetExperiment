@@ -30,14 +30,6 @@ fastRowMeans <- function(mat) {
 }
 
 #' @export
-fastRowVars <- function(mat) {
-    mat <- as(mat, "dgTMatrix")
-    E <- fastRowMeans(mat)
-    V <- computeSparseRowVariances(mat@i + 1, mat@x, E, ncol(mat))
-    return(V)
-}
-
-#' @export
 is.sparseMatrix <- function(A) {
     return(length(which(is(A) == "sparseMatrix")) != 0)
 }
