@@ -25,10 +25,11 @@
     return(x)
 }
 
-.check_and_convert_se_like <- function(object, convert_to = c(
-                                           "none", "ACE", "SCE",
-                                           "SE"
-                                       )) {
+.check_and_convert_se_like <- function(
+  object,
+  convert_to = c("none", "ACE", "SCE", "SE")
+) {
+  
     if (class(object) %in% c("ACTIONetExperiment", "SummarizedExperiment", "SingleCellExperiment")) {
         convert_type <- match.arg(convert_to)
         if (convert_type != "none") {
@@ -67,8 +68,14 @@
     }
 }
 
-.get_attr_or_split_idx <- function(ace, attr, groups_use = NULL, return_vec = FALSE,
-                                   d = 2) {
+.get_attr_or_split_idx <- function(
+  ace,
+  attr,
+  groups_use = NULL,
+  return_vec = FALSE,
+  d = 2
+) {
+
     if (length(attr) == 1) {
         split_vec <- switch(d,
             SummarizedExperiment::rowData(ace)[[attr]],
@@ -108,59 +115,4 @@
     } else {
         return(IDX_out)
     }
-}
-
-.fast_bind_sparse_rows <- function(A, B) {
-    sp_mat <- bind_mats_sparse(A, B, 0)
-    return(sp_mat)
-}
-
-.fast_bind_sparse_cols <- function(A, B) {
-    sp_mat <- bind_mats_sparse(A, B, 1)
-    return(sp_mat)
-}
-
-.fast_bind_dense_rows <- function(A, B) {
-    mat <- bind_mats_dense(A, B, 0)
-    return(mat)
-}
-
-.fast_bind_dense_cols <- function(A, B) {
-    mat <- bind_mats_dense(A, B, 1)
-    return(mat)
-}
-
-.fast_bind_generic <- function(..., d = 1){
-
-  args <- list(...)
-  if(!(d %in% c(1,2)) ){
-    stop("Invalid 'dim'")
-  }
-
-  if( any(sapply(args, is.sparseMatrix)) ){
-    args = lapply(args, function(x) as(x, "sparseMatrix"))
-    out = switch(
-      d,
-      Reduce(.fast_bind_sparse_rows, args),
-      Reduce(.fast_bind_sparse_cols, args)
-    )
-  } else {
-    args = lapply(args, function(x) as.matrix(x))
-    out = switch(
-      d,
-      Reduce(.fast_bind_dense_rows, args),
-      Reduce(.fast_bind_dense_cols, args)
-    )
-  }
-  return(out)
-}
-
-armaBindRows <- function(...){
-  out <- .fast_bind_generic(..., d = 1)
-  return(out)
-}
-
-armaBindCols <- function(...){
-  out <- .fast_bind_generic(..., d = 2)
-  return(out)
 }

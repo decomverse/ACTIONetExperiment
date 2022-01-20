@@ -50,3 +50,60 @@ revert_ace_as_sce <- function(ace) {
     )
     return(sce)
 }
+
+#' @export
+get.data.or.split <- function(
+  ace,
+  attr,
+  groups_use = NULL,
+  to_return = c("data", "levels", "split"),
+  d = 2
+) {
+
+    to_return = match.arg(to_return)
+
+    if (length(attr) == 1) {
+        data_vec <- switch(d,
+            SummarizedExperiment::rowData(ace)[[attr]],
+            SummarizedExperiment::colData(ace)[[attr]]
+        )
+    } else {
+        if (length(attr) != dim(ace)[d]) {
+            err <- sprintf("'attr' length does not match %s of ace.\n", ifelse(d ==
+                1, "NROW", "NCOL"))
+            stop(err)
+        }
+        data_vec <- attr
+    }
+
+    if (is.null(data_vec)) {
+        stop(sprintf("Invalid split conditions.\n"))
+    } else {
+        data_vec <- as.character(data_vec)
+    }
+
+    idx <- 1:dim(ace)[d]
+
+    ## Ignores 'to_return'. Always returns index list.
+    if (!is.null(groups_use)) {
+        sub_idx <- which(data_vec %in% groups_use)
+        data_vec <- data_vec[sub_idx]
+        if (is.null(data_vec)) {
+              stop(sprintf("Invalid split conditions.\n"))
+          }
+        idx_list <- split(idx[sub_idx], data_vec)
+        return(idx_list)
+    } else {
+        idx_list <- split(idx, data_vec)
+    }
+
+    if (to_return == "data") {
+        return(data_vec)
+    } else if (to_return == "levels"){
+        fac_vec = factor(data_vec)
+        level.list = list(index = as.numeric(fac_vec), keys = levels(fac_vec))
+        return(level.list)
+    } else if (to_return == "split"){
+        return(idx_list)
+    }
+}
