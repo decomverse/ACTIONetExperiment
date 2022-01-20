@@ -18,7 +18,8 @@ fastRowSums <- function(mat) {
 
 #' @export
 fastColMeans <- function(mat) {
-    E <- fastColSums(mat) / nrow(mat)
+    # E <- fastColSums(mat) / nrow(mat)
+    E <- Matrix::colSums(mat) / nrow(mat)
     return(E)
 }
 
