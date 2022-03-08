@@ -31,7 +31,9 @@ fastRowMeans <- function(mat) {
 
 #' @export
 is.sparseMatrix <- function(A) {
-    return(length(which(is(A) == "sparseMatrix")) != 0)
+    # return(length(which(is(A) == "sparseMatrix")) != 0)
+    is_sparse = any(is(A) == "sparseMatrix")
+    return(is_sparse)
 }
 
 #' @export
