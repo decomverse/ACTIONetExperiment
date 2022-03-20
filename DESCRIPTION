@@ -4,10 +4,8 @@ Title: ACTIONetExperiment container object
 Version: 1.0.1
 Date: 2022-02-12
 Authors@R: c(
-    person("Shahin", "Mohammadi", email = "shahin.mohammadi@gmail.com",
-        role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8734-2326")),
-    person("Sebastian", "Pineda", email = "sebastianpineda95@gmail.com",
-            role = "aut", comment = c(ORCID = "0000-0002-8903-0550"))
+    person("Shahin", "Mohammadi", email = "shahin.mohammadi@gmail.com", role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8734-2326")),
+    person("Sebastian", "Pineda", email = "sebastianpineda95@gmail.com", role = "aut", comment = c(ORCID = "0000-0002-8903-0550"))
     )
 Maintainer: Shahin Mohammadi <shahin.mohammadi@gmail.com>
 Description:
