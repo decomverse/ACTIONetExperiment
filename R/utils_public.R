@@ -18,7 +18,6 @@ fastRowSums <- function(mat) {
 
 #' @export
 fastColMeans <- function(mat) {
-    # E <- fastColSums(mat) / nrow(mat)
     E <- Matrix::colSums(mat) / nrow(mat)
     return(E)
 }
@@ -31,19 +30,8 @@ fastRowMeans <- function(mat) {
 
 #' @export
 is.sparseMatrix <- function(A) {
-    # return(length(which(is(A) == "sparseMatrix")) != 0)
     is_sparse = any(is(A) == "sparseMatrix")
     return(is_sparse)
-}
-
-#' @export
-revert_ace_as_sce <- function(ace) {
-    sce <- SingleCellExperiment::SingleCellExperiment(
-        assays = SummarizedExperiment::assays(ace),
-        colData = SummarizedExperiment::colData(ace),
-        rowData = SummarizedExperiment::rowData(ace)
-    )
-    return(sce)
 }
 
 #' @export
@@ -105,3 +93,13 @@ get.data.or.split <- function(
         return(idx_list)
     }
 }
+
+# #' @export
+# revert_ace_as_sce <- function(ace) {
+#     sce <- SingleCellExperiment::SingleCellExperiment(
+#         assays = SummarizedExperiment::assays(ace),
+#         colData = SummarizedExperiment::colData(ace),
+#         rowData = SummarizedExperiment::rowData(ace)
+#     )
+#     return(sce)
+# }
