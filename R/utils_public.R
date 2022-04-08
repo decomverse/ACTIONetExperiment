@@ -93,13 +93,3 @@ get.data.or.split <- function(
         return(idx_list)
     }
 }
-
-# #' @export
-# revert_ace_as_sce <- function(ace) {
-#     sce <- SingleCellExperiment::SingleCellExperiment(
-#         assays = SummarizedExperiment::assays(ace),
-#         colData = SummarizedExperiment::colData(ace),
-#         rowData = SummarizedExperiment::rowData(ace)
-#     )
-#     return(sce)
-# }
