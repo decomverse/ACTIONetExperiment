@@ -1,6 +1,6 @@
 #CSOURCES+=$(shell find base -type f -name "*.c")
 #SOURCES+=$(shell find base -type f -name "*.cc")
 OBJECTS=RcppExports.o RCpp_util.o # $(SOURCES:.cc=.o) $(CSOURCES:.c=.o)
-PKG_CPPFLAGS=`find ../inst/include -type d -print | sed s/^/-I/` -w -m64 -DINT_64BITS -DARMA_64BIT_WORD -O2 -march=native -mtune=native -w -m64 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
-PKG_CXXFLAGS=`find ../inst/include -type d -print | sed s/^/-I/` -w -m64 -DINT_64BITS -DARMA_64BIT_WORD -O2 -march=native -mtune=native -w -std=c++14 -m64 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
+PKG_CPPFLAGS=`find ../inst/include -type d -print | sed s/^/-I/` -w -m64 -DINT_64BITS -DARMA_64BIT_WORD -O3 -w -m64 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
+PKG_CXXFLAGS=`find ../inst/include -type d -print | sed s/^/-I/` -w -m64 -DINT_64BITS -DARMA_64BIT_WORD -O3 -w -std=c++14 -m64 -fno-strict-aliasing -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
 MAKEFLAGS+="-j ${NPROC}"
