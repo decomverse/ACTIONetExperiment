@@ -343,7 +343,7 @@ read.HD5List <- function(
 ACE2AnnData <- function(
   ace,
   file,
-  main_assay = "logcounts",
+  main_assay = NULL,
   full.export = TRUE,
   compression_level = 0
 ) {
@@ -352,6 +352,19 @@ ACE2AnnData <- function(
 
     # Ensure it can be case as an ACE object
     ace <- as(ace, "ACTIONetExperiment")
+    if(is.null(main_assay)) {
+        if("default_assay" %in% names(metadata(ace))) {
+        message(sprintf("Input main_assay is NULL. Setting main_assay to the metadata(ace)[['default_assay']]"))
+        main_assay = metadata(ace)[["default_assay"]]      
+        } else {
+        message(sprintf("Input main_assay is NULL. Setting main_assay to logcounts"))
+        main_assay = "logcounts"
+        }
+    }
+    if( !(main_assay %in% names(assays(ace))) ) {
+        stop(sprintf("Input main_assay (%s) does not exist in assays(ace). Abort.", main_assay))
+    }
+
 
     if (file.exists(file)) {
         file.remove(file)
@@ -771,6 +784,23 @@ AnnData2ACE <- function(
     }
 
     h5file$close_all()
+
+
+    if( !("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace))) ) {
+        X = assays(ace.query)[["X"]]
+        subX = X[1:100, 1:100]
+        x = as.numeric(subX)
+        if(length(setdiff(unique(x), 1:max(round(x)))) == 0) {
+            if( !("counts" %in% names(assays(ace))) ) {
+                names(assays(ace))[which(names(assays(ace)) == "X")] = "counts"
+            } else {
+                names(assays(ace))[which(names(assays(ace)) == "X")] = "logcounts"
+                metadata(ace)[["default_assay"]] = "logcounts"
+            }
+        }
+    } else {
+        metadata(ace)[["default_assay"]] = "X"
+    }
 
     return(ace)
 }
