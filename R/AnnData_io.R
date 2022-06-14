@@ -302,9 +302,10 @@ read.HD5SCategorial <- function(
   gname,
   compression_level = 0
 ) {
+    h5group <- h5file[[gname]]
 
-    codes <- h5file[["codes"]]$read()
-    categories <- h5file[["categories"]]$read()
+    codes <- h5group[["codes"]]$read()
+    categories <- h5group[["categories"]]$read()
 
     f = factor(codes+1, categories)
 
