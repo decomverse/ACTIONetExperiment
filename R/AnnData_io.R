@@ -777,7 +777,7 @@ AnnData2ACE <- function(
 
 
     if( !("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace))) ) {
-        X = assays(ace.query)[["X"]]
+        X = assays(ace)[["X"]]
         subX = X[1:100, 1:100]
         x = as.numeric(subX)
         if(length(setdiff(unique(x), 1:max(round(x)))) == 0) {
