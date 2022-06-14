@@ -11,6 +11,7 @@ h5addAttr.str <- function(h5group, attr.name, attr.val) {
 
 #' @import hdf5r
 h5addAttr.str_array <- function(h5group, attr.name, attr.val) {
+
     dtype <- H5T_STRING$new(type = "c", size = Inf)
     dtype <- dtype$set_cset(cset = "UTF-8")
 
@@ -21,124 +22,120 @@ h5addAttr.str_array <- function(h5group, attr.name, attr.val) {
 }
 
 #' @import hdf5r
-write.HD5DF <- function(h5file,
-                        gname,
-                        DF,
-                        compression_level = 0) {
-    string.dtype <- H5T_STRING$new(type = "c", size = Inf)
-    string.dtype <- string.dtype$set_cset(cset = "UTF-8")
+write.HD5DF <- function(
+  h5file,
+  gname,
+  DF,
+  compression_level = 0
+) {
 
-    DF <- as.data.frame(DF)
+    string.dtype = H5T_STRING$new(type = "c", size = Inf)
+    string.dtype = string.dtype$set_cset(cset = "UTF-8")
 
-    N <- NROW(DF)
+    DF = as.data.frame(DF)
 
-    h5group <- h5file$create_group(gname)
+    N = NROW(DF)
+
+    h5group = h5file$create_group(gname)
 
     h5addAttr.str(h5group, "_index", "index")
     h5addAttr.str(h5group, "encoding-version", "0.1.0")
     h5addAttr.str(h5group, "encoding-type", "dataframe")
 
     if (0 < NCOL(DF)) {
-        noncat.num.vars <- which(sapply(DF, is.numeric))
-        cat.vars <- which(sapply(DF, function(x) length(unique(x)) < 256))
-        cat.vars <- setdiff(cat.vars, noncat.num.vars)
-        noncat.vars <- setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
-        cn <- colnames(DF)
-        catDF <- DF[, cat.vars, drop = FALSE]
-        catDF <- apply(catDF, 2, as.character)
-        catDF[is.na(catDF)] <- "NA"
+        noncat.num.vars = which(apply(DF, 2, is.numeric))
+        cat.vars = which(apply(DF, 2, function(x) length(unique(x)) < 128))
+        cat.vars = setdiff(cat.vars, noncat.num.vars)
+        noncat.vars = setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
+        cn = colnames(DF)
+        catDF = DF[, cat.vars, drop = FALSE]
+        catDF = apply(catDF, 2, as.character)
+        catDF[is.na(catDF)] = "NA"
 
-        numDF <- DF[, noncat.num.vars, drop = FALSE]
-        numDF <- apply(numDF, 2, as.numeric)
-        numDF[is.na(numDF)] <- NA
+        numDF = DF[, noncat.num.vars, drop = FALSE]
+        numDF = apply(numDF, 2, as.numeric)
+        numDF[is.na(numDF)] = NA
 
-        nonNumDF <- DF[, noncat.vars, drop = FALSE]
-        nonNumDF <- apply(nonNumDF, 2, as.character)
-        nonNumDF[is.na(nonNumDF)] <- NA
+        nonNumDF = DF[, noncat.vars, drop = FALSE]
+        nonNumDF = apply(nonNumDF, 2, as.character)
+        nonNumDF[is.na(nonNumDF)] = NA
 
         if (length(cn) == 0) {
-            dtype <- H5T_STRING$new(type = "c", size = Inf)
-            dtype <- dtype$set_cset(cset = "UTF-8")
-            space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
+            dtype = H5T_STRING$new(type = "c", size = Inf)
+            dtype = dtype$set_cset(cset = "UTF-8")
+            space = H5S$new(type = "simple", dims = 0, maxdims = 10)
 
             h5group$create_attr(attr_name = "column-order", dtype = dtype, space = space)
+
         } else {
             h5addAttr.str_array(h5group, "column-order", cn)
         }
 
         if (length(cat.vars) > 0) {
-            cat <- h5group$create_group("__categories")
+            cat = h5group$create_group("__categories")
 
             for (i in 1:length(cat.vars)) {
-                x <- catDF[, i]
-                l <- sort(unique(x))
-                v <- match(x, l) - 1
+                x = catDF[, i]
+                l = sort(unique(x))
+                v = match(x, l) - 1
 
-                dtype <- H5T_STRING$new(type = "c", size = Inf)
-                dtype <- dtype$set_cset(cset = "UTF-8")
-                l.enum <- cat$create_dataset(colnames(DF)[cat.vars[i]], l,
-                    gzip_level = compression_level,
-                    dtype = dtype
-                )
+                dtype = H5T_STRING$new(type = "c", size = Inf)
+                dtype = dtype$set_cset(cset = "UTF-8")
+                l.enum = cat$create_dataset(colnames(DF)[cat.vars[i]], l, gzip_level = compression_level,
+                  dtype = dtype)
 
 
-                dtype <- H5T_ENUM$new(labels = c("FALSE", "TRUE"), values = 0:1)
-                space <- H5S$new(type = "scalar")
-                res <- l.enum$create_attr(attr_name = "ordered", dtype = dtype, space = space)
+                dtype = H5T_ENUM$new(labels = c("FALSE", "TRUE"), values = 0:1)
+                space = H5S$new(type = "scalar")
+                res = l.enum$create_attr(attr_name = "ordered", dtype = dtype, space = space)
 
-                attr <- l.enum$attr_open_by_name(attr_name = "ordered", ".")
+                attr = l.enum$attr_open_by_name(attr_name = "ordered", ".")
                 attr$write(0)
 
-                l.vec <- h5group$create_dataset(colnames(DF)[cat.vars[i]], as.integer(v),
-                    gzip_level = compression_level, dtype = h5types$H5T_NATIVE_INT8
-                )
+                l.vec = h5group$create_dataset(colnames(DF)[cat.vars[i]], as.integer(v),
+                  gzip_level = compression_level, dtype = h5types$H5T_NATIVE_INT8)
 
-                ref <- cat$create_reference(name = colnames(DF)[cat.vars[i]])
+                ref = cat$create_reference(name = colnames(DF)[cat.vars[i]])
 
-                dtype <- guess_dtype(ref)
-                space <- H5S$new(type = "scalar")
-                res <- l.vec$create_attr(
-                    attr_name = "categories", dtype = dtype,
-                    space = space
-                )
-                attr <- l.vec$attr_open_by_name(attr_name = "categories", ".")
+                dtype = guess_dtype(ref)
+                space = H5S$new(type = "scalar")
+                res = l.vec$create_attr(attr_name = "categories", dtype = dtype,
+                  space = space)
+                attr = l.vec$attr_open_by_name(attr_name = "categories", ".")
                 attr$write(ref)
+
             }
         }
         if (length(noncat.num.vars) > 0) {
             for (i in 1:NCOL(numDF)) {
-                x <- numDF[, i]
-                nn <- colnames(numDF)[i]
-                h5group$create_dataset(nn, as.single(x),
-                    gzip_level = compression_level,
-                    dtype = h5types$H5T_IEEE_F32LE
-                )
+                x = numDF[, i]
+                nn = colnames(numDF)[i]
+                h5group$create_dataset(nn, as.single(x), gzip_level = compression_level,
+                  dtype = h5types$H5T_IEEE_F32LE)
             }
         }
 
         if (length(noncat.vars) > 0) {
             for (i in 1:NCOL(nonNumDF)) {
-                x <- nonNumDF[, i]
-                nn <- colnames(nonNumDF)[i]
-                dtype <- H5T_STRING$new(type = "c", size = Inf)
-                dtype <- dtype$set_cset(cset = "UTF-8")
-                h5group$create_dataset(nn, x,
-                    gzip_level = compression_level,
-                    dtype = string.dtype
-                )
+                x = nonNumDF[, i]
+                nn = colnames(nonNumDF)[i]
+                dtype = H5T_STRING$new(type = "c", size = Inf)
+                dtype = dtype$set_cset(cset = "UTF-8")
+                h5group$create_dataset(nn, x, gzip_level = compression_level,
+                  dtype = string.dtype)
             }
         }
     } else {
-        dtype <- H5T_STRING$new(type = "c", size = Inf)
-        dtype <- dtype$set_cset(cset = "UTF-8")
-        space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
+        dtype = H5T_STRING$new(type = "c", size = Inf)
+        dtype = dtype$set_cset(cset = "UTF-8")
+        space = H5S$new(type = "simple", dims = 0, maxdims = 10)
 
         h5group$create_attr(attr_name = "column-order", dtype = dtype, space = space)
     }
 
-    index <- rownames(DF)
+    index = rownames(DF)
     if (length(unique(index)) < length(index)) {
-        index <- make.names(index, unique = TRUE)
+        index = make.names(index, unique = TRUE)
     }
     h5group$create_dataset("index", index, gzip_level = compression_level, dtype = string.dtype)
 }
@@ -165,12 +162,15 @@ write.HD5SpMat <- function(h5file,
 }
 
 #' @import hdf5r
-write.HD5List <- function(h5file,
-                          gname,
-                          obj_list,
-                          depth = 1,
-                          max_depth = 5,
-                          compression_level = 0) {
+write.HD5List <- function(
+  h5file,
+  gname,
+  obj_list,
+  depth = 1,
+  max_depth = 5,
+  compression_level = 0
+) {
+
     h5group <- h5file$create_group(gname)
 
     obj_list <- as.list(obj_list)
@@ -202,9 +202,12 @@ write.HD5List <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5DF <- function(h5file,
-                       gname,
-                       compression_level = 0) {
+read.HD5DF <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+
     h5group <- h5file[[gname]]
 
     if (!(h5group$attr_open_by_name("encoding-type", ".")$read() == "dataframe")) {
@@ -250,9 +253,12 @@ read.HD5DF <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5SpMat <- function(h5file,
-                          gname,
-                          compression_level = 0) {
+read.HD5SpMat <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+
     h5group <- h5file[[gname]]
     attr <- h5attributes(h5group)
     if (!(("encoding-type" %in% names(attr)) & (attr[["encoding-type"]] %in% c(
@@ -286,11 +292,14 @@ read.HD5SpMat <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5List <- function(h5file,
-                         gname,
-                         depth = 1,
-                         max_depth = 5,
-                         compression_level = 0) {
+read.HD5List <- function(
+  h5file,
+  gname,
+  depth = 1,
+  max_depth = 5,
+  compression_level = 0
+) {
+
     h5group <- h5file[[gname]]
 
     obj_names <- names(h5group)
@@ -331,15 +340,31 @@ read.HD5List <- function(h5file,
 
 #' @import hdf5r
 #' @export
-ACE2AnnData <- function(ace,
-                        file,
-                        main_assay = "logcounts",
-                        full.export = TRUE,
-                        compression_level = 0) {
+ACE2AnnData <- function(
+  ace,
+  file,
+  main_assay = NULL,
+  full.export = TRUE,
+  compression_level = 0
+) {
+
     .check_and_load_package("hdf5r")
 
     # Ensure it can be case as an ACE object
     ace <- as(ace, "ACTIONetExperiment")
+    if(is.null(main_assay)) {
+        if("default_assay" %in% names(metadata(ace))) {
+        message(sprintf("Input main_assay is NULL. Setting main_assay to the metadata(ace)[['default_assay']]"))
+        main_assay = metadata(ace)[["default_assay"]]      
+        } else {
+        message(sprintf("Input main_assay is NULL. Setting main_assay to logcounts"))
+        main_assay = "logcounts"
+        }
+    }
+    if( !(main_assay %in% names(assays(ace))) ) {
+        stop(sprintf("Input main_assay (%s) does not exist in assays(ace). Abort.", main_assay))
+    }
+
 
     if (file.exists(file)) {
         file.remove(file)
@@ -402,6 +427,15 @@ ACE2AnnData <- function(ace,
 
     ## Write obs (colData() in ace)
     obs.DF <- as.data.frame(SummarizedExperiment::colData(ace))
+    if (0 < NCOL(obs.DF)) {
+        obs.DF <- as.data.frame(lapply(SummarizedExperiment::colData(ace), function(x) {
+            if (is.numeric(x) & (!is.null(names(x)))) {
+                return(factor(names(x), names(x)[match(unique(x), x)]))
+            } else {
+                return(x)
+            }
+        }))
+    }
     rownames(obs.DF) <- colnames(ace)
 
     write.HD5DF(h5file, gname = "obs", obs.DF, compression_level = compression_level)
@@ -553,133 +587,118 @@ ACE2AnnData <- function(ace,
     h5file$close_all()
 }
 
+import.h5.data.slot <- function(h5file, gname, attr) {
+    if (length(attr) == 0) {
+        X = h5file[[gname]]$read()
+    } else {
+        if(attr[["encoding-type"]] == "array") {
+            X = h5file[[gname]]$read()
+        } else if(attr[["encoding-type"]] == "dataframe") {
+            X = as.matrix(read.HD5DF(h5file = h5file, gname = gname))
+        } else if(attr[["encoding-type"]] %in% c("csr_matrix", "csc_matrix")) {
+            X = read.HD5SpMat(h5file = h5file, gname = gname)
+        } else {
+            stop(sprintf("Unknown format %s for X", attr[["encoding-type"]]))
+        }
+    }
+
+    return(X)
+}
+
 #' @import hdf5r
 #' @export
-AnnData2ACE <- function(file,
-                        main_assay = "X",
-                        import_X = TRUE) {
+AnnData2ACE <- function(
+  file,
+  main_assay = "X",
+  import_X = TRUE
+) {
+
     .check_and_load_package("hdf5r")
 
-    h5file <- H5File$new(file, mode = "r")
+    h5file = H5File$new(file, mode = "r")
 
-    objs <- names(h5file)
+    objs = names(h5file)
 
-    if (import_X == TRUE) {
-        X.attr <- h5attributes(h5file[["X"]])
-        if (length(X.attr) == 0) {
-            # Full matrix
-            X <- h5file[["X"]]$read()
-        } else {
-            X <- read.HD5SpMat(h5file = h5file, gname = "X")
-        }
+    if(import_X == TRUE){
+      X.attr = h5attributes(h5file[["X"]])
+      X = import.h5.data.slot(h5file, "X", X.attr)
 
-        input_assays <- list(X)
-        names(input_assays) <- main_assay
+      input_assays = list(X)
+      names(input_assays) = main_assay
     } else {
-        input_assays <- list()
+      input_assays = list()
     }
 
     if ("layers" %in% objs) {
-        layers <- h5file[["layers"]]
-        additional_assays <- vector("list", length(names(layers)))
-        names(additional_assays) <- names(layers)
+        layers = h5file[["layers"]]
+        additional_assays = vector("list", length(names(layers)))
+        names(additional_assays) = names(layers)
 
         for (an in names(layers)) {
-            attr <- h5attributes(layers[[an]])
-            if (length(attr) == 0) {
-                # Dense matrix
-                additional_assays[[an]] <- layers[[an]]$read()
-            } else {
-                additional_assays[[an]] <- read.HD5SpMat(h5file = layers, gname = an)
-            }
+            attr = h5attributes(layers[[an]])
+            additional_assays[[an]] = import.h5.data.slot(layers, an, attr)
         }
-        input_assays <- c(input_assays, additional_assays)
+        input_assays = c(input_assays, additional_assays)
     }
     invisible(gc())
 
     if ("obs" %in% objs) {
-        obs.DF <- read.HD5DF(h5file = h5file, gname = "obs")
+        obs.DF = read.HD5DF(h5file = h5file, gname = "obs")
     } else {
-        obs.DF <- DataFrame(row.names = paste("Cell", 1:NCOL(X), sep = ""))
+        obs.DF = DataFrame(row.names = paste("Cell", 1:NCOL(X), sep = ""))
     }
 
     if ("var" %in% objs) {
-        var.DF <- read.HD5DF(h5file = h5file, gname = "var")
+        var.DF = read.HD5DF(h5file = h5file, gname = "var")
     } else {
-        var.DF <- DataFrame(row.names = paste("Gene", 1:NROW(X), sep = ""))
+        var.DF = DataFrame(row.names = paste("Gene", 1:NROW(X), sep = ""))
     }
 
-    input_assays <- lapply(input_assays, function(X) {
-        rownames(X) <- rownames(var.DF)
-        colnames(X) <- rownames(obs.DF)
+    input_assays = lapply(input_assays, function(X) {
+        rownames(X) = rownames(var.DF)
+        colnames(X) = rownames(obs.DF)
         return(X)
     })
 
-    ace <- ACTIONetExperiment(assays = input_assays, rowData = var.DF, colData = obs.DF)
+    ace = ACTIONetExperiment(assays = input_assays, rowData = var.DF, colData = obs.DF)
     rm(input_assays)
     invisible(gc())
 
-    var.DF <- rowData(ace)
+    var.DF = rowData(ace)
     if (sum(colnames(var.DF) %in% c("chr", "start", "end")) == 3) {
-        cols <- match(c("chr", "start", "end"), colnames(obs.DF))
-        BED <- var.DF[, cols]
-        var.DF <- var.DF[, -cols]
-        GR <- GenomicRanges::makeGRangesFromDataFrame(BED)
-        elementMetadata(GR) <- var.DF
+        cols = match(c("chr", "start", "end"), colnames(obs.DF))
+        BED = var.DF[, cols]
+        var.DF = var.DF[, -cols]
+        GR = GenomicRanges::makeGRangesFromDataFrame(BED)
+        elementMetadata(GR) = var.DF
 
-        SummarizedExperiment::rowRanges(ace) <- GR
+        SummarizedExperiment::rowRanges(ace) = GR
     }
 
     if ("obsm" %in% objs) {
-        obsm <- h5file[["obsm"]]
+        obsm = h5file[["obsm"]]
         for (mn in names(obsm)) {
-            attr <- h5attributes(obsm[[mn]])
-            if ("encoding-type" %in% names(attr)) {
-                if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
-                    Xr <- read.HD5SpMat(obsm, mn, compression_level)
-                } else if (attr[["encoding-type"]] %in% c("dataframe")) {
-                    Xr = Matrix::t(as.matrix(read.HD5DF(obsm, mn, compression_level)))
-                } else {
-                    err <- sprintf("Error reading obsm %s", mn)
-                    h5file$close_all()
-                    message(attr)
-                    stop(msg)
-                }
-            } else {
-                Xr <- obsm[[mn]]$read()
-            }
+            attr = h5attributes(obsm[[mn]])
+            Xr = import.h5.data.slot(obsm, mn, attr)
 
             if (sum(grepl(pattern = "^X_", mn))) {
-                nn <- stringr::str_sub(mn, start = 3)
+                nn = stringr::str_sub(mn, start = 3)
             } else {
-                nn <- mn
+                nn = mn
             }
-            colMaps(ace)[[nn]] <- Matrix::t(Xr)
+            colMaps(ace)[[nn]] = Matrix::t(Xr)
             rm(Xr)
             invisible(gc())
         }
     }
 
     if ("varm" %in% objs) {
-        varm <- h5file[["varm"]]
+        varm = h5file[["varm"]]
         for (nn in names(varm)) {
-            attr <- h5attributes(varm[[nn]])
-            if ("encoding-type" %in% names(attr)) {
-                if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
-                    Xr <- read.HD5SpMat(varm, nn, compression_level)
-                } else if (attr[["encoding-type"]] %in% c("dataframe")) {
-                    Xr = Matrix::t(as.matrix(read.HD5DF(obsm, mn, compression_level)))
-                } else {
-                    err <- sprintf("Error reading obsm %s", nn)
-                    h5file$close_all()
-                    message(attr)
-                    stop(err)
-                }
-            } else {
-                Xr <- varm[[nn]]$read()
-            }
+            attr = h5attributes(varm[[nn]])
+            Xr = import.h5.data.slot(varm, nn, attr)
 
-            rowMaps(ace)[[nn]] <- Matrix::t(Xr)
+            rowMaps(ace)[[nn]] = Matrix::t(Xr)
             rm(Xr)
             invisible(gc())
         }
@@ -687,72 +706,93 @@ AnnData2ACE <- function(file,
 
 
     if ("obsp" %in% objs) {
-        obsp <- h5file[["obsp"]]
+        obsp = h5file[["obsp"]]
         for (pn in names(obsp)) {
-            Net <- read.HD5SpMat(obsp, pn)
-            colNets(ace)[[pn]] <- Net
+            attr = h5attributes(obsp[[pn]])
+            Net = import.h5.data.slot(obsp, pn, attr)
+
+            colNets(ace)[[pn]] = Net
         }
     }
 
     if ("varp" %in% objs) {
-        varp <- h5file[["varp"]]
+        varp = h5file[["varp"]]
         for (pn in names(varp)) {
-            Net <- read.HD5SpMat(varp, pn)
-            rowNets(ace)[[pn]] <- Net
+            attr = h5attributes(varp[[pn]])
+            Net = import.h5.data.slot(varp, pn, attr)
+
+            rowNets(ace)[[pn]] = Net
         }
     }
 
 
     if ("uns" %in% objs) {
-        uns <- h5file[["uns"]]
+        uns = h5file[["uns"]]
         if ("obsm_annot" %in% names(uns)) {
             # Import obs annotations
-            obsm_annot <- uns[["obsm_annot"]]
+            obsm_annot = uns[["obsm_annot"]]
             for (nn in names(obsm_annot)) {
-                factor_annot <- obsm_annot[[nn]]
-                colMapTypes(ace)[[nn]] <- factor_annot[["type"]]$read()
+                factor_annot = obsm_annot[[nn]]
+                colMapTypes(ace)[[nn]] = factor_annot[["type"]]$read()
                 if ("annotation" %in% names(factor_annot)) {
-                    DF <- read.HD5DF(factor_annot, "annotation")
-                    colMapMeta(ace)[[nn]] <- DF
+                  DF = read.HD5DF(factor_annot, "annotation")
+                  colMapMeta(ace)[[nn]] = DF
                 }
             }
         }
         if ("varm_annot" %in% names(uns)) {
             # Import obs annotations
-            var_annot <- uns[["varm_annot"]]
+            var_annot = uns[["varm_annot"]]
             for (nn in names(var_annot)) {
-                factor_annot <- var_annot[[nn]]
-                rowMapTypes(ace)[[nn]] <- factor_annot[["type"]]$read()
+                factor_annot = var_annot[[nn]]
+                rowMapTypes(ace)[[nn]] = factor_annot[["type"]]$read()
                 if ("annotation" %in% names(factor_annot)) {
-                    DF <- read.HD5DF(factor_annot, "annotation")
-                    rowMapMeta(ace)[[nn]] <- DF
+                  DF = read.HD5DF(factor_annot, "annotation")
+                  rowMapMeta(ace)[[nn]] = DF
                 }
             }
         }
         if ("metadata" %in% names(uns)) {
-            meta_data_objs <- read.HD5List(uns, "metadata",
-                depth = 1, max_depth = 10,
-                compression_level = compression_level
-            )
+            meta_data_objs = read.HD5List(uns, "metadata", depth = 1, max_depth = 10,
+                compression_level = compression_level)
         } else {
-            meta_data_objs <- NULL
+            meta_data_objs = NULL
         }
 
 
 
-        meta <- read.HD5List(h5file = h5file, gname = "uns")
-        meta <- meta[setdiff(names(meta), c("obsm_annot", "varm_annot", "metadata"))]
+        meta = read.HD5List(h5file = h5file, gname = "uns")
+        meta = meta[setdiff(names(meta), c("obsm_annot", "varm_annot", "metadata"))]
         if (!is.null(meta_data_objs)) {
             if (length(meta) == 0) {
-                meta <- meta_data_objs
+                meta = meta_data_objs
             } else {
-                meta <- c(meta_data_objs, meta)
+                meta = c(meta_data_objs, meta)
             }
         }
-        metadata(ace) <- meta
+        metadata(ace) = meta
     }
 
     h5file$close_all()
+
+
+    if( !("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace))) ) {
+        X = assays(ace)[["X"]]
+        subX = X[1:100, 1:100]
+        x = as.numeric(subX)
+        if(length(setdiff(unique(x), 0:max(round(x)+1))) == 0) {
+            if( !("counts" %in% names(assays(ace))) ) {
+                names(assays(ace))[which(names(assays(ace)) == "X")] = "counts"
+            } 
+        } else {
+            if( !("logcounts" %in% names(assays(ace))) ) {
+                names(assays(ace))[which(names(assays(ace)) == "X")] = "logcounts"
+                metadata(ace)[["default_assay"]] = "logcounts"
+            }
+        }
+    } else {
+        metadata(ace)[["default_assay"]] = "X"
+    }
 
     return(ace)
 }
