@@ -587,6 +587,24 @@ ACE2AnnData <- function(
     h5file$close_all()
 }
 
+import.h5.data.slot <- function(h5file, gname, attr) {
+    if (length(attr) == 0) {
+        X = h5file[[gname]]$read()
+    } else {
+        if(attr[["encoding-type"]] == "array") {
+            X = h5file[[gname]]$read()
+        } else if(attr[["encoding-type"]] == "dataframe") {
+            X = as.matrix(read.HD5DF(h5file = h5file, gname = gname))
+        } else if(attr[["encoding-type"]] %in% c("csr_matrix", "csc_matrix")) {
+            X = read.HD5SpMat(h5file = h5file, gname = gname)
+        } else {
+            stop(sprintf("Unknown format %s for X", attr[["encoding-type"]]))
+        }
+    }
+
+    return(X)
+}
+
 #' @import hdf5r
 #' @export
 AnnData2ACE <- function(
@@ -603,12 +621,7 @@ AnnData2ACE <- function(
 
     if(import_X == TRUE){
       X.attr = h5attributes(h5file[["X"]])
-      if (length(X.attr) == 0) {
-          # Full matrix
-          X = h5file[["X"]]$read()
-      } else {
-          X = read.HD5SpMat(h5file = h5file, gname = "X")
-      }
+      X = import.h5.data.slot(h5file, "X", X.attr)
 
       input_assays = list(X)
       names(input_assays) = main_assay
@@ -623,12 +636,7 @@ AnnData2ACE <- function(
 
         for (an in names(layers)) {
             attr = h5attributes(layers[[an]])
-            if (length(attr) == 0) {
-                # Dense matrix
-                additional_assays[[an]] = layers[[an]]$read()
-            } else {
-                additional_assays[[an]] = read.HD5SpMat(h5file = layers, gname = an)
-            }
+            additional_assays[[an]] = import.h5.data.slot(layers, an, attr)
         }
         input_assays = c(input_assays, additional_assays)
     }
@@ -671,18 +679,7 @@ AnnData2ACE <- function(
         obsm = h5file[["obsm"]]
         for (mn in names(obsm)) {
             attr = h5attributes(obsm[[mn]])
-            if ("encoding-type" %in% names(attr)) {
-                if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
-                  Xr = read.HD5SpMat(obsm, mn, compression_level)
-                } else {
-                  err = sprintf("Error reading obsm %s", mn)
-                  h5file$close_all()
-                  message(attr)
-                  stop(msg)
-                }
-            } else {
-                Xr = obsm[[mn]]$read()
-            }
+            Xr = import.h5.data.slot(obsm, mn, attr)
 
             if (sum(grepl(pattern = "^X_", mn))) {
                 nn = stringr::str_sub(mn, start = 3)
@@ -699,18 +696,7 @@ AnnData2ACE <- function(
         varm = h5file[["varm"]]
         for (nn in names(varm)) {
             attr = h5attributes(varm[[nn]])
-            if ("encoding-type" %in% names(attr)) {
-                if (attr[["encoding-type"]] %in% c("csc_matrix", "csr_matrix")) {
-                  Xr = read.HD5SpMat(varm, nn, compression_level)
-                } else {
-                  err = sprintf("Error reading obsm %s", nn)
-                  h5file$close_all()
-                  message(attr)
-                  stop(err)
-                }
-            } else {
-                Xr = varm[[nn]]$read()
-            }
+            Xr = import.h5.data.slot(varm, nn, attr)
 
             rowMaps(ace)[[nn]] = Matrix::t(Xr)
             rm(Xr)
@@ -722,7 +708,9 @@ AnnData2ACE <- function(
     if ("obsp" %in% objs) {
         obsp = h5file[["obsp"]]
         for (pn in names(obsp)) {
-            Net = read.HD5SpMat(obsp, pn)
+            attr = h5attributes(obsp[[pn]])
+            Net = import.h5.data.slot(obsp, pn, attr)
+
             colNets(ace)[[pn]] = Net
         }
     }
@@ -730,7 +718,9 @@ AnnData2ACE <- function(
     if ("varp" %in% objs) {
         varp = h5file[["varp"]]
         for (pn in names(varp)) {
-            Net = read.HD5SpMat(varp, pn)
+            attr = h5attributes(varp[[pn]])
+            Net = import.h5.data.slot(varp, pn, attr)
+
             rowNets(ace)[[pn]] = Net
         }
     }
