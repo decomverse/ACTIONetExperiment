@@ -231,7 +231,7 @@ read.HD5DF <- function(
             attr = h5attributes(h5group[[vn]])
             v = import.h5.data.slot(h5group, vn, attr)
 
-            v[v == -1] <- NA
+            #v[v == -1] <- NA
             vars[[vn]] <- v
         }
 
@@ -308,6 +308,7 @@ read.HD5SCategorial <- function(
     categories <- h5group[["categories"]]$read()
 
     idx = codes+1
+    idx[idx <= 0] = NA
     vals = categories[idx]
     f = factor(vals, categories)
 
@@ -711,7 +712,12 @@ AnnData2ACE <- function(
             } else {
                 nn = mn
             }
-            colMaps(ace)[[nn]] = Matrix::t(Xr)
+
+            if(nrow(Xr) != ncol(ace)) {
+                Xr = Matrix::t(Xr)
+            }
+
+            colMaps(ace)[[nn]] = Xr
             rm(Xr)
             invisible(gc())
         }
@@ -723,7 +729,11 @@ AnnData2ACE <- function(
             attr = h5attributes(varm[[nn]])
             Xr = import.h5.data.slot(varm, nn, attr)
 
-            rowMaps(ace)[[nn]] = Matrix::t(Xr)
+            if(nrow(Xr) != nrow(ace)) {
+                Xr = Matrix::t(Xr)
+            }
+
+            rowMaps(ace)[[nn]] = Xr
             rm(Xr)
             invisible(gc())
         }
