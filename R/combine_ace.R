@@ -46,7 +46,7 @@ setMethod("rbind", "ACTIONetExperiment", function(..., deparse.level = 1) {
     return(args)
 }
 
-# .ace_cat_slots <- function(args) {
+# .ace_cat_dimdata <- function(args, d) {
 #     used_slots = c()
 #     AN_slots = c("colMaps", "rowMaps", "colNets", "rowNets")
 #     used_slots = sapply(args, function(x) {
@@ -73,4 +73,16 @@ setMethod("rbind", "ACTIONetExperiment", function(..., deparse.level = 1) {
 #             colMaps = nc_rep, check = FALSE)
 #     })
 #     return(args)
+# }
+#
+# .ace_cat_coldata <- function(args) {
+#
+#
+#
+# }
+#
+# .ace_cat_rowdata <- function(args) {
+#
+#
+#
 # }
