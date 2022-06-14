@@ -228,7 +228,9 @@ read.HD5DF <- function(
         vars <- vector("list", length(column.names))
         names(vars) <- column.names
         for (vn in names(vars)) {
-            v <- h5group[[vn]]$read()
+            attr = h5attributes(h5group[[vn]])
+            v = import.h5.data.slot(h5group, vn, attr)
+
             v[v == -1] <- NA
             vars[[vn]] <- v
         }
@@ -239,7 +241,9 @@ read.HD5DF <- function(
                 if (!(nn %in% column.names)) {
                     next
                 }
-                l <- cat[[nn]]$read()
+                attr = h5attributes(cat[[nn]])
+                l = import.h5.data.slot(cat, nn, attr)
+
                 vars[[nn]] <- factor(l[vars[[nn]] + 1], l)
             }
         }
@@ -289,6 +293,22 @@ read.HD5SpMat <- function(
     }
 
     return(X)
+}
+
+
+#' @import hdf5r
+read.HD5SCategorial <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+
+    codes <- h5file[["codes"]]$read()
+    categories <- h5file[["categories"]]$read()
+
+    f = factor(codes+1, categories)
+
+    return(f)
 }
 
 #' @import hdf5r
@@ -588,7 +608,7 @@ ACE2AnnData <- function(
 }
 
 import.h5.data.slot <- function(h5file, gname, attr) {
-    if (length(attr) == 0) {
+    if (length(attr) == 0 || !("encoding-type" %in% names(attr))) {
         X = h5file[[gname]]$read()
     } else {
         if(attr[["encoding-type"]] == "array") {
@@ -597,6 +617,8 @@ import.h5.data.slot <- function(h5file, gname, attr) {
             X = as.matrix(read.HD5DF(h5file = h5file, gname = gname))
         } else if(attr[["encoding-type"]] %in% c("csr_matrix", "csc_matrix")) {
             X = read.HD5SpMat(h5file = h5file, gname = gname)
+        } else if(attr[["encoding-type"]] == "categorical") {
+            X = read.HD5SCategorial(h5file = h5file, gname = gname)
         } else {
             stop(sprintf("Unknown format %s for X", attr[["encoding-type"]]))
         }
