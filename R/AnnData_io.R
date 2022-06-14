@@ -307,7 +307,9 @@ read.HD5SCategorial <- function(
     codes <- h5group[["codes"]]$read()
     categories <- h5group[["categories"]]$read()
 
-    f = factor(codes+1, categories)
+    idx = codes+1
+    vals = categories[idx]
+    f = factor(vals, categories)
 
     return(f)
 }
