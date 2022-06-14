@@ -780,10 +780,12 @@ AnnData2ACE <- function(
         X = assays(ace)[["X"]]
         subX = X[1:100, 1:100]
         x = as.numeric(subX)
-        if(length(setdiff(unique(x), 1:max(round(x)))) == 0) {
+        if(length(setdiff(unique(x), 0:max(round(x)+1))) == 0) {
             if( !("counts" %in% names(assays(ace))) ) {
                 names(assays(ace))[which(names(assays(ace)) == "X")] = "counts"
-            } else {
+            } 
+        } else {
+            if( !("logcounts" %in% names(assays(ace))) ) {
                 names(assays(ace))[which(names(assays(ace)) == "X")] = "logcounts"
                 metadata(ace)[["default_assay"]] = "logcounts"
             }
