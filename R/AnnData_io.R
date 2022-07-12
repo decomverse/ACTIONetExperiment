@@ -321,17 +321,9 @@ read.HD5SStringArray <- function(
   gname,
   compression_level = 0
 ) {
-    h5group <- h5file[[gname]]
-
-    codes <- h5group[["codes"]]$read()
-    categories <- h5group[["categories"]]$read()
-
-    idx = codes+1
-    idx[idx <= 0] = NA
-    vals = categories[idx]
-    f = factor(vals, categories)
-
-    return(f)
+    arr <- h5file[[gname]]$read()
+    
+    return(arr)
 }
 
 #' @import hdf5r
