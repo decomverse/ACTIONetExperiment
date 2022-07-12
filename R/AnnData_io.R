@@ -316,6 +316,25 @@ read.HD5SCategorial <- function(
 }
 
 #' @import hdf5r
+read.HD5SStringArray <- function(
+  h5file,
+  gname,
+  compression_level = 0
+) {
+    h5group <- h5file[[gname]]
+
+    codes <- h5group[["codes"]]$read()
+    categories <- h5group[["categories"]]$read()
+
+    idx = codes+1
+    idx[idx <= 0] = NA
+    vals = categories[idx]
+    f = factor(vals, categories)
+
+    return(f)
+}
+
+#' @import hdf5r
 read.HD5List <- function(
   h5file,
   gname,
@@ -623,7 +642,10 @@ import.h5.data.slot <- function(h5file, gname, attr) {
             X = read.HD5SpMat(h5file = h5file, gname = gname)
         } else if(attr[["encoding-type"]] == "categorical") {
             X = read.HD5SCategorial(h5file = h5file, gname = gname)
-        } else {
+        } else if(attr[["encoding-type"]] == "string-array") {
+            X = read.HD5SStringArray(h5file = h5file, gname = gname)
+        } 
+        else {
             stop(sprintf("Unknown format %s for X", attr[["encoding-type"]]))
         }
     }
