@@ -706,7 +706,7 @@ AnnData2ACE <- function(
 
     var.DF = rowData(ace)
     if (sum(colnames(var.DF) %in% c("chr", "start", "end")) == 3) {
-        cols = match(c("chr", "start", "end"), colnames(obs.DF))
+        cols = match(c("chr", "start", "end"), colnames(var.DF))
         BED = var.DF[, cols]
         var.DF = var.DF[, -cols]
         GR = GenomicRanges::makeGRangesFromDataFrame(BED)
