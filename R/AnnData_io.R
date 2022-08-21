@@ -25,7 +25,7 @@ write.HD5DF <- function(h5file,
                         gname,
                         DF,
                         compression_level = 0) {
-    string.dtype <- H5T_STRING$new(type = "c", size = Inf)
+    string.dtype <- H5T_STRING$new(type = "c", size = 256)
     string.dtype <- string.dtype$set_cset(cset = "UTF-8")
 
     DF <- as.data.frame(DF)
@@ -39,8 +39,10 @@ write.HD5DF <- function(h5file,
     h5addAttr.str(h5group, "encoding-type", "dataframe")
 
     if (0 < NCOL(DF)) {
-        noncat.num.vars <- which(apply(DF, 2, is.numeric))
-        cat.vars <- which(apply(DF, 2, function(x) length(unique(x)) < 128))
+        # noncat.num.vars <- which(apply(DF, 2, is.numeric))
+        noncat.num.vars <- which(sapply(names(DF), function(nn) is.numeric(DF[[nn]])))
+        cat.vars <- which(sapply(names(DF), function(nn) length(unique(DF[[nn]])) < 128))
+        # cat.vars <- which(apply(DF, 2, function(x) length(unique(x)) < 128))
         cat.vars <- setdiff(cat.vars, noncat.num.vars)
         noncat.vars <- setdiff(1:NCOL(DF), c(cat.vars, noncat.num.vars))
         cn <- colnames(DF)
@@ -57,7 +59,7 @@ write.HD5DF <- function(h5file,
         nonNumDF[is.na(nonNumDF)] <- NA
 
         if (length(cn) == 0) {
-            dtype <- H5T_STRING$new(type = "c", size = Inf)
+            dtype <- H5T_STRING$new(type = "c", size = 256)
             dtype <- dtype$set_cset(cset = "UTF-8")
             space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
 
@@ -74,7 +76,7 @@ write.HD5DF <- function(h5file,
                 l <- sort(unique(x))
                 v <- match(x, l) - 1
 
-                dtype <- H5T_STRING$new(type = "c", size = Inf)
+                dtype <- H5T_STRING$new(type = "c", size = 256)
                 dtype <- dtype$set_cset(cset = "UTF-8")
                 l.enum <- cat$create_dataset(colnames(DF)[cat.vars[i]], l,
                     gzip_level = compression_level,
@@ -120,7 +122,7 @@ write.HD5DF <- function(h5file,
             for (i in 1:NCOL(nonNumDF)) {
                 x <- nonNumDF[, i]
                 nn <- colnames(nonNumDF)[i]
-                dtype <- H5T_STRING$new(type = "c", size = Inf)
+                dtype <- H5T_STRING$new(type = "c", size = 256)
                 dtype <- dtype$set_cset(cset = "UTF-8")
                 h5group$create_dataset(nn, x,
                     gzip_level = compression_level,
@@ -129,7 +131,7 @@ write.HD5DF <- function(h5file,
             }
         }
     } else {
-        dtype <- H5T_STRING$new(type = "c", size = Inf)
+        dtype <- H5T_STRING$new(type = "c", size = 256)
         dtype <- dtype$set_cset(cset = "UTF-8")
         space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
 
@@ -176,8 +178,7 @@ write.HD5List <- function(h5file,
     obj_list <- as.list(obj_list)
     obj_list <- obj_list[match(unique(names(obj_list)), names(obj_list))]
 
-    # string.dtype <- H5Tcopy("H5T_C_S1")
-    # string.dtype <- H5T_STRING$new(type = "c", size = Inf)
+    # string.dtype <- H5T_STRING$new(type = "c", size = 100)
     # string.dtype <- string.dtype$set_cset(cset = "UTF-8")
 
     for (nn in names(obj_list)) {
@@ -200,9 +201,8 @@ write.HD5List <- function(h5file,
         } else if (is.matrix(obj) | is.numeric(obj)) {
             h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = h5types$H5T_IEEE_F32LE)
         } else if (is.character(obj) | length(obj) == 1) {
-            # H5Tset_size(string.dtype, size = stringi::stri_length(obj))
             h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = H5T_STRING$new(type = "c", size = stringi::stri_length(obj)))
-            # h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = H5T_STRING$new(size = Inf))
+            # h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = string.dtype)
         } else {
             h5group[[nn]] <- obj
         }
