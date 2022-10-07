@@ -1,7 +1,7 @@
 #' @import hdf5r
 h5addAttr.str <- function(h5group, attr.name, attr.val) {
     dtype <- H5T_STRING$new(type = "c", size = Inf)
-    dtype <- dtype$set_cset(cset = "UTF-8")
+    dtype <- dtype$set_cset(cset = "unknown")
 
     space <- H5S$new(type = "scalar")
     h5group$create_attr(attr_name = attr.name, dtype = dtype, space = space)
@@ -12,7 +12,7 @@ h5addAttr.str <- function(h5group, attr.name, attr.val) {
 #' @import hdf5r
 h5addAttr.str_array <- function(h5group, attr.name, attr.val) {
     dtype <- H5T_STRING$new(type = "c", size = Inf)
-    dtype <- dtype$set_cset(cset = "UTF-8")
+    dtype <- dtype$set_cset(cset = "unknown")
 
     space <- H5S$new(type = "simple", dims = length(attr.val), maxdims = length(attr.val))
     h5group$create_attr(attr_name = attr.name, dtype = dtype, space = space)
@@ -25,8 +25,8 @@ write.HD5DF <- function(h5file,
                         gname,
                         DF,
                         compression_level = 0) {
-    string.dtype <- H5T_STRING$new(type = "c", size = 256)
-    string.dtype <- string.dtype$set_cset(cset = "UTF-8")
+    string.dtype <- H5T_STRING$new(type = "c", size = Inf)
+    string.dtype <- string.dtype$set_cset(cset = "unknown")
 
     DF <- as.data.frame(DF)
 
@@ -59,8 +59,8 @@ write.HD5DF <- function(h5file,
         nonNumDF[is.na(nonNumDF)] <- NA
 
         if (length(cn) == 0) {
-            dtype <- H5T_STRING$new(type = "c", size = 256)
-            dtype <- dtype$set_cset(cset = "UTF-8")
+            dtype <- H5T_STRING$new(type = "c", size = Inf)
+            dtype <- dtype$set_cset(cset = "unknown")
             space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
 
             h5group$create_attr(attr_name = "column-order", dtype = dtype, space = space)
@@ -76,8 +76,8 @@ write.HD5DF <- function(h5file,
                 l <- sort(unique(x))
                 v <- match(x, l) - 1
 
-                dtype <- H5T_STRING$new(type = "c", size = 256)
-                dtype <- dtype$set_cset(cset = "UTF-8")
+                dtype <- H5T_STRING$new(type = "c", size = Inf)
+                dtype <- dtype$set_cset(cset = "unknown")
                 l.enum <- cat$create_dataset(colnames(DF)[cat.vars[i]], l,
                     gzip_level = compression_level,
                     dtype = dtype
@@ -122,8 +122,8 @@ write.HD5DF <- function(h5file,
             for (i in 1:NCOL(nonNumDF)) {
                 x <- nonNumDF[, i]
                 nn <- colnames(nonNumDF)[i]
-                dtype <- H5T_STRING$new(type = "c", size = 256)
-                dtype <- dtype$set_cset(cset = "UTF-8")
+                dtype <- H5T_STRING$new(type = "c", size = Inf)
+                dtype <- dtype$set_cset(cset = "unknown")
                 h5group$create_dataset(nn, x,
                     gzip_level = compression_level,
                     dtype = string.dtype
@@ -131,8 +131,8 @@ write.HD5DF <- function(h5file,
             }
         }
     } else {
-        dtype <- H5T_STRING$new(type = "c", size = 256)
-        dtype <- dtype$set_cset(cset = "UTF-8")
+        dtype <- H5T_STRING$new(type = "c", size = Inf)
+        dtype <- dtype$set_cset(cset = "unknown")
         space <- H5S$new(type = "simple", dims = 0, maxdims = 10)
 
         h5group$create_attr(attr_name = "column-order", dtype = dtype, space = space)
@@ -179,7 +179,7 @@ write.HD5List <- function(h5file,
     obj_list <- obj_list[match(unique(names(obj_list)), names(obj_list))]
 
     # string.dtype <- H5T_STRING$new(type = "c", size = 100)
-    # string.dtype <- string.dtype$set_cset(cset = "UTF-8")
+    # string.dtype <- string.dtype$set_cset(cset = "unknown")
 
     for (nn in names(obj_list)) {
         obj <- obj_list[[nn]]
@@ -457,7 +457,7 @@ ACE2AnnData <- function(ace,
     obs.DF <- as.data.frame(SummarizedExperiment::colData(ace))
     if (0 < NCOL(obs.DF)) {
         obs.DF <- as.data.frame(lapply(SummarizedExperiment::colData(ace), function(x) {
-            if (is.numeric(x) & (!is.null(names(x)))) {
+            if (is.numeric(x) & (!is.null(names(x))) & (length(unique(names(x))) < length(x) / 2)) {
                 return(factor(names(x), names(x)[match(unique(x), x)]))
             } else {
                 return(x)
