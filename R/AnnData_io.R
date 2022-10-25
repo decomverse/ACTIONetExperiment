@@ -200,7 +200,7 @@ write.HD5List <- function(h5file,
             write.HD5SpMat(h5group, nn, obj, compression_level = compression_level)
         } else if (is.matrix(obj) | is.numeric(obj)) {
             h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = h5types$H5T_IEEE_F32LE)
-        } else if (is.character(obj) | length(obj) == 1) {
+        } else if (is.character(obj) & length(obj) == 1) {
             h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = H5T_STRING$new(type = "c", size = stringi::stri_length(obj)))
             # h5group$create_dataset(nn, obj, gzip_level = compression_level, dtype = string.dtype)
         } else {
@@ -385,8 +385,12 @@ ACE2AnnData <- function(ace,
             message(sprintf("Input main_assay is NULL. Setting main_assay to the metadata(ace)[['default_assay']]"))
             main_assay <- metadata(ace)[["default_assay"]]
         } else {
-            message(sprintf("Input main_assay is NULL. Setting main_assay to logcounts"))
-            main_assay <- "logcounts"
+            if ("logcounts" %in% names(assays(ace))) {
+                main_assay <- "logcounts"
+            } else {
+                main_assay <- "counts"
+            }
+            message(sprintf("Input main_assay is NULL. Setting main_assay to %s", main_assay))
         }
     }
     if (!(main_assay %in% names(assays(ace)))) {
