@@ -300,9 +300,9 @@ read.HD5SpMat <- function(h5file,
 
 
 #' @import hdf5r
-read.HD5SCategorial <- function(h5file,
-                                gname,
-                                compression_level = 0) {
+read.HD5Categorial <- function(h5file,
+                               gname,
+                               compression_level = 0) {
     h5group <- h5file[[gname]]
 
     codes <- h5group[["codes"]]$read()
@@ -317,9 +317,18 @@ read.HD5SCategorial <- function(h5file,
 }
 
 #' @import hdf5r
-read.HD5SStringArray <- function(h5file,
-                                 gname,
-                                 compression_level = 0) {
+read.HD5Dict <- function(h5file,
+                         gname,
+                         compression_level = 0) {
+    ll <- read.HD5List(h5file = h5file, gname = gname, compression_level = compression_level)
+
+    return(ll)
+}
+
+#' @import hdf5r
+read.HD5StringArray <- function(h5file,
+                                gname,
+                                compression_level = 0) {
     arr <- h5file[[gname]]$read()
 
     return(arr)
@@ -341,15 +350,7 @@ read.HD5List <- function(h5file,
         for (nn in obj_names) {
             attr <- h5attributes(h5group[[nn]])
             if (length(attr) > 0 & ("encoding-type" %in% names(attr))) {
-                if ((attr[["encoding-type"]] == "csc_matrix") | (attr[["encoding-type"]] ==
-                    "csr_matrix")) {
-                    obj <- read.HD5SpMat(h5group, nn, compression_level = compression_level)
-                } else if ((attr[["encoding-type"]] == "dataframe")) {
-                    obj <- read.HD5DF(h5group, nn, compression_level = compression_level)
-                } else {
-                    warning(sprintf("Unknown encoding %s", attr[["encoding-type"]]))
-                    next
-                }
+                obj <- import.h5.data.slot(h5group, nn, attr)
             } else if (h5group[[nn]]$get_obj_type() == 2 & (depth < max_depth)) {
                 obj <- read.HD5List(h5group, nn,
                     compression_level = compression_level,
@@ -630,9 +631,15 @@ import.h5.data.slot <- function(h5file, gname, attr) {
         } else if (attr[["encoding-type"]] %in% c("csr_matrix", "csc_matrix")) {
             X <- read.HD5SpMat(h5file = h5file, gname = gname)
         } else if (attr[["encoding-type"]] == "categorical") {
-            X <- read.HD5SCategorial(h5file = h5file, gname = gname)
+            X <- read.HD5Categorial(h5file = h5file, gname = gname)
         } else if (attr[["encoding-type"]] == "string-array") {
-            X <- read.HD5SStringArray(h5file = h5file, gname = gname)
+            X <- read.HD5StringArray(h5file = h5file, gname = gname)
+        } else if (attr[["encoding-type"]] == "dict") {
+            X <- read.HD5Dict(h5file = h5file, gname = gname)
+        } else if (attr[["encoding-type"]] == "string") {
+            X <- read.HD5StringArray(h5file = h5file, gname = gname)
+        } else if (attr[["encoding-type"]] == "numeric-scalar") {
+            X <- h5file[[gname]]$read()
         } else {
             stop(sprintf("Unknown format %s for X", attr[["encoding-type"]]))
         }
