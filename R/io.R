@@ -236,7 +236,7 @@ import.ace.from.10X.h5 <- function(
     }
     rownames(x = sparse.mat) <- features
     colnames(x = sparse.mat) <- barcodes[]
-    sparse.mat <- as(object = sparse.mat, Class = "dgCMatrix")
+    sparse.mat <- as(object = sparse.mat, Class = "dMatrix")
 
     if (h5file$exists(name = paste0(genome, "/features"))) {
         types <- h5file[[paste0(genome, "/features/feature_type")]][]

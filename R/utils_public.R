@@ -1,7 +1,7 @@
 #' @export
 fastColSums <- function(mat) {
-    if (is.sparseMatrix(mat) && class(mat) != "dgCMatrix") {
-        mat <- as(mat, "dgCMatrix")
+    if (is.sparseMatrix(mat) && class(mat) != "dMatrix") {
+        mat <- as(mat, "dMatrix")
     }
     out <- fast_column_sums(mat)
     return(out)
@@ -9,8 +9,8 @@ fastColSums <- function(mat) {
 
 #' @export
 fastRowSums <- function(mat) {
-    if (is.sparseMatrix(mat) && class(mat) != "dgCMatrix") {
-        mat <- as(mat, "dgCMatrix")
+    if (is.sparseMatrix(mat) && class(mat) != "dMatrix") {
+        mat <- as(mat, "dMatrix")
     }
     out <- fast_row_sums(mat)
     return(out)
