@@ -689,6 +689,8 @@ AnnData2ACE <- function(file,
     }
     invisible(gc())
 
+    default_assay_name <- names(input_assays)[1]
+
     if ("obs" %in% objs) {
         obs.DF <- read.HD5DF(h5file = h5file, gname = "obs")
     } else {
@@ -708,7 +710,7 @@ AnnData2ACE <- function(file,
     })
 
     ace <- ACTIONetExperiment(assays = input_assays, rowData = var.DF, colData = obs.DF)
-    metadata(ace)[["default_assay"]] <- names(input_assays)[1]
+    metadata(ace)[["default_assay"]] <- default_assay_name
 
     rm(input_assays)
     invisible(gc())
