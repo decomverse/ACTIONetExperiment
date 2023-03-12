@@ -477,11 +477,13 @@ ACE2AnnData <- function(ace,
     ## Write var (matching rowData() in ace)
     var.DF <- as.data.frame(SummarizedExperiment::rowData(ace))
     rownames(var.DF) <- rownames(ace)
-    if (class(SummarizedExperiment::rowRanges(ace)) == "GRanges") {
+
+
+
+    if (is(ace, "RangedSummarizedExperiment")) {
         GR <- SummarizedExperiment::rowRanges(ace)
         BED <- data.frame(chr = as.character(GenomeInfoDb::seqnames(GR)), start = start(GR), end = end(GR))
-        var.DF <- cbind(BED, var.DF)
-
+        var.DF <- cbind(BED, elementMetadata(GR), var.DF)
         metadata(ace)$genome <- genome(ace)
     }
     write.HD5DF(h5file, "var", var.DF, compression_level = compression_level)
@@ -716,14 +718,11 @@ AnnData2ACE <- function(file,
     invisible(gc())
 
     var.DF <- rowData(ace)
-    if (all(colnames(var.DF) %in% c("chr", "start", "end"))) {
-        cols <- match(c("chr", "start", "end"), colnames(var.DF))
-        BED <- var.DF[, cols]
-        var.DF <- var.DF[, -cols]
-        GR <- GenomicRanges::makeGRangesFromDataFrame(BED)
-        elementMetadata(GR) <- var.DF
-
-        SummarizedExperiment::rowRanges(ace) <- GR
+    if (ncol(var.DF) > 0) {
+        if (all(colnames(var.DF) %in% c("chr", "start", "end"))) {
+            GR <- GenomicRanges::makeGRangesFromDataFrame(var.DF, keep.extra.columns = T)
+            SummarizedExperiment::rowRanges(ace) <- GR
+        }
     }
 
     if ("obsm" %in% objs) {
