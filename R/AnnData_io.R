@@ -481,10 +481,13 @@ ACE2AnnData <- function(ace,
 
 
     if (is(ace, "RangedSummarizedExperiment")) {
-        GR <- SummarizedExperiment::rowRanges(ace)
-        BED <- data.frame(chr = as.character(GenomeInfoDb::seqnames(GR)), start = start(GR), end = end(GR))
-        var.DF <- cbind(BED, elementMetadata(GR), var.DF)
-        metadata(ace)$genome <- genome(ace)
+        GR <- rowRanges(axes.ace)
+        GR.df <- GenomicRanges::as.data.frame(GR)
+        if (nrow(GR.df) == nrow(var.DF)) {
+            BED <- data.frame(chr = as.character(GenomeInfoDb::seqnames(GR)), start = start(GR), end = end(GR))
+            var.DF <- cbind(BED, elementMetadata(GR), var.DF)
+            metadata(ace)$genome <- genome(ace)
+        }
     }
     write.HD5DF(h5file, "var", var.DF, compression_level = compression_level)
 
