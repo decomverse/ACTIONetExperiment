@@ -150,7 +150,7 @@ write.HD5SpMat <- function(h5file,
                            gname,
                            X,
                            compression_level = 0) {
-    X <- Matrix::t(as(X, "dgCMatrix"))
+    X <- Matrix::t(as(X, "dMatrix"))
     Xgroup <- h5file$create_group(gname)
 
 
@@ -216,7 +216,7 @@ read.HD5DF <- function(h5file,
     h5group <- h5file[[gname]]
 
     if (!(h5group$attr_open_by_name("encoding-type", ".")$read() == "dataframe")) {
-        err <- sprintf("%s is not a dataframe. Abort.\n", gname)
+        err <- sprintf("%s is not a dataframe.\n", gname)
         stop(err)
     }
 
@@ -271,7 +271,7 @@ read.HD5SpMat <- function(h5file,
         "csc_matrix",
         "csr_matrix"
     )))) {
-        err <- sprintf("%s is not a sparse matrix. Abort.\n", gname)
+        err <- sprintf("%s is not a sparse matrix.\n", gname)
         stop(err)
     }
 
@@ -294,7 +294,7 @@ read.HD5SpMat <- function(h5file,
         invisible(gc())
     }
 
-    X <- as(X, "dgCMatrix")
+    X <- as(X, "dMatrix")
     return(X)
 }
 
@@ -395,7 +395,8 @@ ACE2AnnData <- function(ace,
         }
     }
     if (!(main_assay %in% names(assays(ace)))) {
-        stop(sprintf("Input main_assay (%s) does not exist in assays(ace). Abort.", main_assay))
+        err = sprintf("Input main_assay (%s) does not exist in assays(ace).", main_assay)
+        stop(err)
     }
 
 
@@ -597,7 +598,7 @@ ACE2AnnData <- function(ace,
         CN <- colNets(ace)
         if ((length(CN) > 0)) {
             obsp <- h5file$create_group("obsp")
-            CN <- lapply(CN, function(x) as(x, "dgCMatrix"))
+            CN <- lapply(CN, function(x) as(x, "dMatrix"))
 
             for (i in 1:length(CN)) {
                 write.HD5SpMat(obsp, gname = names(CN)[[i]], CN[[i]], compression_level = compression_level)
@@ -609,7 +610,7 @@ ACE2AnnData <- function(ace,
         RN <- rowNets(ace)
         if ((length(RN) > 0)) {
             varp <- h5file$create_group("varp")
-            RN <- lapply(RN, function(x) as(x, "dgCMatrix"))
+            RN <- lapply(RN, function(x) as(x, "dMatrix"))
 
             for (i in 1:length(RN)) {
                 write.HD5SpMat(varp, gname = names(RN)[[i]], RN[[i]], compression_level = compression_level)
@@ -651,36 +652,44 @@ import.h5.data.slot <- function(h5file, gname, attr) {
 #' @import hdf5r
 #' @export
 AnnData2ACE <- function(file,
-                        main_assay = "X",
                         import_X = TRUE) {
     .check_and_load_package("hdf5r")
 
     h5file <- H5File$new(file, mode = "r")
 
     objs <- names(h5file)
-
-    if (import_X == TRUE) {
-        X.attr <- h5attributes(h5file[["X"]])
-        X <- import.h5.data.slot(h5file, "X", X.attr)
-
-        input_assays <- list(X)
-        names(input_assays) <- main_assay
-    } else {
-        input_assays <- list()
-    }
+    input_assays <- list()
 
     if ("layers" %in% objs) {
         layers <- h5file[["layers"]]
-        additional_assays <- vector("list", length(names(layers)))
-        names(additional_assays) <- names(layers)
+        # additional_assays <- vector("list", length(names(layers)))
+        # names(additional_assays) <- names(layers)
+        input_assays <- vector("list", length(names(layers)))
+        names(input_assays) <- names(layers)
 
         for (an in names(layers)) {
             attr <- h5attributes(layers[[an]])
-            additional_assays[[an]] <- import.h5.data.slot(layers, an, attr)
+            # additional_assays[[an]] <- import.h5.data.slot(layers, an, attr)
+            input_assays[[an]] <- import.h5.data.slot(layers, an, attr)
         }
-        input_assays <- c(input_assays, additional_assays)
+        # input_assays <- c(input_assays, additional_assays)
     }
     invisible(gc())
+
+    if(length(input_assays) == 0 && import_X == FALSE) {
+      stop("input file has no assays.")
+    } else if (import_X == TRUE) {
+      X.attr <- h5attributes(h5file[["X"]])
+      X <- import.h5.data.slot(h5file, "X", X.attr)
+
+      # input_assays <- list(X)
+      # names(input_assays) <- main_assay
+
+      input_assays <- c(list("X" = X), input_assays)
+    }
+    invisible(gc())
+
+    metadata(ace)[["default_assay"]] = names(input_assays)[1]
 
     if ("obs" %in% objs) {
         obs.DF <- read.HD5DF(h5file = h5file, gname = "obs")
@@ -705,7 +714,7 @@ AnnData2ACE <- function(file,
     invisible(gc())
 
     var.DF <- rowData(ace)
-    if (sum(colnames(var.DF) %in% c("chr", "start", "end")) == 3) {
+    if (all(colnames(var.DF) %in% c("chr", "start", "end"))) {
         cols <- match(c("chr", "start", "end"), colnames(var.DF))
         BED <- var.DF[, cols]
         var.DF <- var.DF[, -cols]
@@ -826,6 +835,7 @@ AnnData2ACE <- function(file,
 
     h5file$close_all()
 
+<<<<<<< HEAD
 
     if (!("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace)))) {
         X <- assays(ace)[["X"]]
@@ -845,6 +855,9 @@ AnnData2ACE <- function(file,
     } else {
         metadata(ace)[["default_assay"]] <- "X"
     }
+=======
+    # metadata(ace)[["default_assay"]] <- main_assay
+>>>>>>> be043ac33b8b6448a8159ff5b0e64de3a145393c
 
     return(ace)
-}
+  }
