@@ -377,7 +377,7 @@ ACE2AnnData <- function(ace,
                         main_assay = NULL,
                         full.export = TRUE,
                         compression_level = 0) {
-    .check_and_load_package("hdf5r")
+    ACTIONetExperiment:::.check_and_load_package("hdf5r")
 
     # Ensure it can be case as an ACE object
     ace <- as(ace, "ACTIONetExperiment")
@@ -411,8 +411,8 @@ ACE2AnnData <- function(ace,
         rownames(ace) <- .default_rownames(NROW(ace))
     }
 
-    colnames(ace) <- ucn <- .make_chars_unique(colnames(ace))
-    rownames(ace) <- urn <- .make_chars_unique(rownames(ace))
+    colnames(ace) <- ucn <- ACTIONetExperiment:::.make_chars_unique(colnames(ace))
+    rownames(ace) <- urn <- ACTIONetExperiment:::.make_chars_unique(rownames(ace))
 
     for (nn in names(SummarizedExperiment::assays(ace))) {
         dimnames(SummarizedExperiment::assays(ace)[[nn]]) <- list(urn, ucn)
