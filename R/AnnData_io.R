@@ -395,7 +395,7 @@ ACE2AnnData <- function(ace,
         }
     }
     if (!(main_assay %in% names(assays(ace)))) {
-        err = sprintf("Input main_assay (%s) does not exist in assays(ace).", main_assay)
+        err <- sprintf("Input main_assay (%s) does not exist in assays(ace).", main_assay)
         stop(err)
     }
 
@@ -676,20 +676,20 @@ AnnData2ACE <- function(file,
     }
     invisible(gc())
 
-    if(length(input_assays) == 0 && import_X == FALSE) {
-      stop("input file has no assays.")
+    if (length(input_assays) == 0 && import_X == FALSE) {
+        stop("input file has no assays.")
     } else if (import_X == TRUE) {
-      X.attr <- h5attributes(h5file[["X"]])
-      X <- import.h5.data.slot(h5file, "X", X.attr)
+        X.attr <- h5attributes(h5file[["X"]])
+        X <- import.h5.data.slot(h5file, "X", X.attr)
 
-      # input_assays <- list(X)
-      # names(input_assays) <- main_assay
+        # input_assays <- list(X)
+        # names(input_assays) <- main_assay
 
-      input_assays <- c(list("X" = X), input_assays)
+        input_assays <- c(list("X" = X), input_assays)
     }
     invisible(gc())
 
-    metadata(ace)[["default_assay"]] = names(input_assays)[1]
+    metadata(ace)[["default_assay"]] <- names(input_assays)[1]
 
     if ("obs" %in% objs) {
         obs.DF <- read.HD5DF(h5file = h5file, gname = "obs")
@@ -835,8 +835,6 @@ AnnData2ACE <- function(file,
 
     h5file$close_all()
 
-<<<<<<< HEAD
-
     if (!("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace)))) {
         X <- assays(ace)[["X"]]
         max_samples <- min(100, min(dim(X)))
@@ -855,9 +853,6 @@ AnnData2ACE <- function(file,
     } else {
         metadata(ace)[["default_assay"]] <- "X"
     }
-=======
-    # metadata(ace)[["default_assay"]] <- main_assay
->>>>>>> be043ac33b8b6448a8159ff5b0e64de3a145393c
 
     return(ace)
-  }
+}
