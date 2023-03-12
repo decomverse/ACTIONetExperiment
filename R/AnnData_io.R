@@ -829,7 +829,8 @@ AnnData2ACE <- function(file,
 
     if (!("logcounts" %in% names(assays(ace))) & ("X" %in% names(assays(ace)))) {
         X <- assays(ace)[["X"]]
-        subX <- X[1:100, 1:100]
+        max_samples <- min(100, min(dim(X)))
+        subX <- X[1:max_samples, 1:max_samples]
         x <- as.numeric(subX)
         if (length(setdiff(unique(x), 0:max(round(x) + 1))) == 0) {
             if (!("counts" %in% names(assays(ace)))) {
