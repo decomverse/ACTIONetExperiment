@@ -481,7 +481,7 @@ ACE2AnnData <- function(ace,
 
 
     if (is(ace, "RangedSummarizedExperiment")) {
-        GR <- rowRanges(axes.ace)
+        GR <- rowRanges(ace)
         GR.df <- GenomicRanges::as.data.frame(GR)
         if (nrow(GR.df) == nrow(var.DF)) {
             BED <- data.frame(chr = as.character(GenomeInfoDb::seqnames(GR)), start = start(GR), end = end(GR))
