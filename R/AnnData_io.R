@@ -220,7 +220,10 @@ read.HD5DF <- function(h5file,
         stop(err)
     }
 
-    rn <- import.h5.data.slot(h5group, gname = h5group$attr_open_by_name("_index", ".")$read(), attr)
+
+    key <- h5group$attr_open_by_name("_index", ".")$read()
+    attr <- h5attributes(h5group[[key]])
+    rn <- import.h5.data.slot(h5group, gname = key, attr)
 
     if (h5file$attr_exists_by_name(obj_name = gname, attr_name = "column-order")) {
         cn <- h5group$attr_open_by_name("column-order", ".")
