@@ -19,13 +19,13 @@ setMethod("[", c("ACTIONetExperiment", "ANY", "ANY"), function(x, i, j, ..., dro
         i <- as.vector(i)
 
         if (length(rnets) > 0) {
-            for (k in 1:length(rnets)) {
+            for (k in seq_along(rnets)) {
                 tmp = rnets[[k]]
                 rnets[[k]] = tmp[i, i]
             }
         }
         if (length(rmaps) > 0) {
-            for (k in 1:length(rmaps)) {
+            for (k in seq_along(rmaps)) {
                 tmp = rmaps[[k]]
                 rmaps[[k]] = tmp[i, , drop = FALSE]
             }
@@ -41,13 +41,13 @@ setMethod("[", c("ACTIONetExperiment", "ANY", "ANY"), function(x, i, j, ..., dro
         j <- as.vector(j)
 
         if (length(cnets) > 0) {
-            for (k in 1:length(cnets)) {
+            for (k in seq_along(cnets)) {
                 tmp = cnets[[k]]
                 cnets[[k]] = tmp[j, j]
             }
         }
         if (length(cmaps) > 0) {
-            for (k in 1:length(cmaps)) {
+            for (k in seq_along(cmaps)) {
                 tmp = cmaps[[k]]
                 cmaps[[k]] = tmp[j, , drop = FALSE]
             }

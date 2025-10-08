@@ -1,22 +1,4 @@
 #' @export
-fastColSums <- function(mat) {
-    if (is.sparseMatrix(mat) && class(mat) != "dMatrix") {
-        mat <- as(mat, "dMatrix")
-    }
-    out <- fast_column_sums(mat)
-    return(out)
-}
-
-#' @export
-fastRowSums <- function(mat) {
-    if (is.sparseMatrix(mat) && class(mat) != "dMatrix") {
-        mat <- as(mat, "dMatrix")
-    }
-    out <- fast_row_sums(mat)
-    return(out)
-}
-
-#' @export
 fastColMeans <- function(mat) {
     E <- Matrix::colSums(mat) / nrow(mat)
     return(E)
@@ -24,7 +6,7 @@ fastColMeans <- function(mat) {
 
 #' @export
 fastRowMeans <- function(mat) {
-    E <- fastRowSums(mat) / ncol(mat)
+    E <- Matrix::rowSums(mat) / ncol(mat)
     return(E)
 }
 
@@ -68,7 +50,7 @@ get.data.or.split <- function(
         data_vec = data_vec
     }
 
-    idx <- 1:dim(ace)[d]
+    idx <- seq_len(dim(ace)[d])
 
     ## Ignores 'to_return'. Always returns index list.
     if (!is.null(groups_use)) {
