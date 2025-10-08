@@ -11,65 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// fast_row_sums
-Rcpp::NumericVector fast_row_sums(SEXP& A);
-RcppExport SEXP _ACTIONetExperiment_fast_row_sums(SEXP ASEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP& >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(fast_row_sums(A));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fast_column_sums
-Rcpp::NumericVector fast_column_sums(SEXP& A);
-RcppExport SEXP _ACTIONetExperiment_fast_column_sums(SEXP ASEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP& >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(fast_column_sums(A));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fast_row_max
-Rcpp::NumericVector fast_row_max(SEXP& A);
-RcppExport SEXP _ACTIONetExperiment_fast_row_max(SEXP ASEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP& >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(fast_row_max(A));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bind_mats_sparse
-arma::sp_mat bind_mats_sparse(SEXP& X1, SEXP& X2, int dim);
-RcppExport SEXP _ACTIONetExperiment_bind_mats_sparse(SEXP X1SEXP, SEXP X2SEXP, SEXP dimSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP& >::type X1(X1SEXP);
-    Rcpp::traits::input_parameter< SEXP& >::type X2(X2SEXP);
-    Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
-    rcpp_result_gen = Rcpp::wrap(bind_mats_sparse(X1, X2, dim));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bind_mats_dense
-arma::mat bind_mats_dense(SEXP& X1, SEXP& X2, int dim);
-RcppExport SEXP _ACTIONetExperiment_bind_mats_dense(SEXP X1SEXP, SEXP X2SEXP, SEXP dimSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP& >::type X1(X1SEXP);
-    Rcpp::traits::input_parameter< SEXP& >::type X2(X2SEXP);
-    Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
-    rcpp_result_gen = Rcpp::wrap(bind_mats_dense(X1, X2, dim));
-    return rcpp_result_gen;
-END_RCPP
-}
 // csr_sort_indices_inplace
 void csr_sort_indices_inplace(Rcpp::IntegerVector& Ap, Rcpp::IntegerVector& Aj, Rcpp::NumericVector& Ax);
 RcppExport SEXP _ACTIONetExperiment_csr_sort_indices_inplace(SEXP ApSEXP, SEXP AjSEXP, SEXP AxSEXP) {
@@ -96,11 +37,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ACTIONetExperiment_fast_row_sums", (DL_FUNC) &_ACTIONetExperiment_fast_row_sums, 1},
-    {"_ACTIONetExperiment_fast_column_sums", (DL_FUNC) &_ACTIONetExperiment_fast_column_sums, 1},
-    {"_ACTIONetExperiment_fast_row_max", (DL_FUNC) &_ACTIONetExperiment_fast_row_max, 1},
-    {"_ACTIONetExperiment_bind_mats_sparse", (DL_FUNC) &_ACTIONetExperiment_bind_mats_sparse, 3},
-    {"_ACTIONetExperiment_bind_mats_dense", (DL_FUNC) &_ACTIONetExperiment_bind_mats_dense, 3},
     {"_ACTIONetExperiment_csr_sort_indices_inplace", (DL_FUNC) &_ACTIONetExperiment_csr_sort_indices_inplace, 3},
     {"_ACTIONetExperiment_csc_sort_indices_inplace", (DL_FUNC) &_ACTIONetExperiment_csc_sort_indices_inplace, 3},
     {NULL, NULL, 0}
