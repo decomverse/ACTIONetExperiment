@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 csr_sort_indices_inplace <- function(Ap, Aj, Ax) {
-    invisible(.Call(`_ACTIONetExperiment_csr_sort_indices_inplace`, Ap, Aj, Ax))
+    invisible(.Call('_ACTIONetExperiment_csr_sort_indices_inplace', PACKAGE = 'ACTIONetExperiment', Ap, Aj, Ax))
 }
 
 csc_sort_indices_inplace <- function(Ap, Ai, Ax) {
-    invisible(.Call(`_ACTIONetExperiment_csc_sort_indices_inplace`, Ap, Ai, Ax))
+    invisible(.Call('_ACTIONetExperiment_csc_sort_indices_inplace', PACKAGE = 'ACTIONetExperiment', Ap, Ai, Ax))
 }
 

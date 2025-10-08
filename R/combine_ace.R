@@ -16,8 +16,6 @@ setMethod("rbind", "ACTIONetExperiment", function(..., deparse.level = 1) {
     out
 })
 
-
-
 .ace_clear_slots <- function(ace_list, slots = c("colNets", "rowNets")) {
     # Clear specified slots if not empty
     dropped <- character(0)
