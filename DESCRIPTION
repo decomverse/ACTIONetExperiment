@@ -8,14 +8,19 @@ Authors@R: c(
     person("Sebastian", "Pineda", email = "sebastianpineda95@gmail.com", role = "aut", comment = c(ORCID = "0000-0002-8903-0550"))
     )
 Maintainer: Shahin Mohammadi <shahin.mohammadi@gmail.com>
-Description:
+Description: ACTIONetExperiment (ACE) extends the SummarizedExperiment class
+    to match the structure of Python AnnData objects, adding first-class
+    containers for row and column reductions, embeddings, networks, and their
+    metadata. It was developed to accompany the ACTIONet single-cell framework
+    but works standalone, and ACE objects are usable wherever
+    SummarizedExperiment or SingleCellExperiment objects are expected.
 License: GPL (>= 2)
 URL: https://github.com/shmohammadi86/ACTIONet
 Depends: R (>= 4.0.0), Matrix, S4Vectors, BiocGenerics, SummarizedExperiment, SingleCellExperiment, hdf5r
 Imports: Rcpp, RcppArmadillo
-Suggests:
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 LinkingTo: Rcpp,RcppArmadillo
-biocViews: ACTION, ACTIONet, ACTIONetExperiment
+biocViews: DataRepresentation, Infrastructure, SingleCell, Software
 Encoding: UTF-8
-VignetteBuilder: knitr
+SystemRequirements: C++17
 RoxygenNote: 7.1.2

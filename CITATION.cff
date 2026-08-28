@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the article below."
+title: "ACTIONetExperiment: an AnnData-shaped container for single-cell omics in R"
+abstract: >-
+  ACTIONetExperiment (ACE) extends SummarizedExperiment to match the structure
+  of Python AnnData objects, adding first-class containers for row and column
+  reductions, embeddings, networks, and their metadata. ACE objects are usable
+  wherever SummarizedExperiment or SingleCellExperiment objects are expected.
+type: software
+repository-code: "https://github.com/shmohammadi86/ACTIONetExperiment"
+license: GPL-2.0-or-later
+authors:
+  - family-names: "Mohammadi"
+    given-names: "Shahin"
+    orcid: "https://orcid.org/0000-0001-8734-2326"
+  - family-names: "Pineda"
+    given-names: "Sebastian"
+    orcid: "https://orcid.org/0000-0002-8903-0550"
+keywords:
+  - single-cell
+  - data structures
+  - SummarizedExperiment
+  - AnnData
+  - Bioconductor
+preferred-citation:
+  type: article
+  title: "A multiresolution framework to characterize single-cell state landscapes"
+  journal: "Nature Communications"
+  volume: 11
+  start: 5399
+  year: 2020
+  doi: "10.1038/s41467-020-18416-6"
+  authors:
+    - family-names: "Mohammadi"
+      given-names: "Shahin"
+    - family-names: "Davila-Velderrain"
+      given-names: "Jose"
+    - family-names: "Kellis"
+      given-names: "Manolis"
